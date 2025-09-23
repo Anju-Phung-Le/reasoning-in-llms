@@ -1,0 +1,8 @@
+{"id":"ex1",
+ "premises":["All B are A.","All B are C."],
+ "question":"Can we conclude: All A are C?",
+ "answer_options":{"A":"Yes","B":"No","C":"Cannot be determined"},
+ "logical_answer":"C",
+ "human_answer":"A",
+ "category":"syllogism",
+ "difficulty":"easy"}
