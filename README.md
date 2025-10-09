@@ -1,2 +1,2 @@
 # reasoning-in-llms
-Repository for master thesis about reasoning in Large Language Models. Human reasoning vs. Logical reasoning.
+Code base for Master thesis on reasoning in Large Language Models. Human reasoning vs. Logical reasoning.
