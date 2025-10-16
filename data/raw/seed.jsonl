@@ -1,0 +1,1 @@
+{"id":"prem1","premises":["All B are A.","All B are C."],"question":"Can we conclude: All A are C?","options":["Yes","No","Cannot determine"],"label_classical":2,"label_wcs":0,"role":"none","domain":"syllogism","form":"AA4"}
