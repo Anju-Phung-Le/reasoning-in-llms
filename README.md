@@ -1,2 +1,2 @@
 # reasoning-in-llms
-Code base for Master thesis on reasoning in Large Language Models. Human reasoning vs. Logical reasoning.
+Testing different LLM models for presence of biases using google T5-families. Human reasoning vs. Logical reasoning.
