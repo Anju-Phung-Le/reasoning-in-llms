@@ -17,7 +17,7 @@ def evaluate(gold_fp: str, pred_fp: str, out_csv: str):
             item = json.loads(line)
             gold[item["id"]] = item
 
-    # Initialize counters for each role
+    # Initialize counters for each role, if role key doesnt exist yet resort to deafult values
     by_role = defaultdict(lambda: {"n":0, "classical_ok":0, "wcs_ok":0})
     
     # Compare model predictions to gold labels
@@ -29,15 +29,13 @@ def evaluate(gold_fp: str, pred_fp: str, out_csv: str):
                 continue
             role = g["role"]
             pred_idx = p.get("pred_index", -1)
-            # Count total items per role
             by_role[role]["n"] += 1
 
-            # Count correct answers for classical and WCS reasoning
+            # Count if model predicts the same labels as gold labels, adds one if correct and 0 if not
             by_role[role]["classical_ok"] += int(pred_idx == g["label_classical"])
             by_role[role]["wcs_ok"] += int(pred_idx == g["label_wcs"])
 
-        # Compute accuracy per role
-
+    # Gets the key and agg values of the dict and compute accuracy per role
     rows = []
     for role, agg in sorted(by_role.items()):
         n = agg["n"] or 1

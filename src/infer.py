@@ -28,13 +28,13 @@ def predict(model_name: str, data_fp: str, out_fp: str, max_new_tokens: int = 2)
             item = json.loads(line)
             prompt = build_prompt(item)
 
-            # Encode text for the model 
+            # Encode text for the model to read
             enc = tok(prompt, return_tensors="pt")
 
             # Generate prediction
             out = mdl.generate(**enc, max_new_tokens=max_new_tokens, do_sample=False)
 
-            # Decode prediction text
+            # Decode prediction back to natural text
             text = tok.decode(out[0], skip_special_tokens=True).strip()
 
             # Extract predicted letter (A, B, C)

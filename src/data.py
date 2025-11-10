@@ -5,7 +5,7 @@ ROLES = ["none","child","teen","adult"]
 
 def expand_roles(in_fp, out_fp):
     """ Reads a JSONL dataset of syllogism items and expands each example
-    to include multiple roles. So in this case for one seed i will get 4 times as many items, 
+    to include all roles. So in this case for one seed we will get 4 times as many items, 
     for each role in ROLES.
 
     Each item keeps the same content but updates its 'role' field and appends the role
