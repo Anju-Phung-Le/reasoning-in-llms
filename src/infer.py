@@ -16,10 +16,8 @@ def predict(model_name: str, data_fp: str, out_fp: str, max_new_tokens: int = 2)
         out_fp (str): Path to save predictions (flan_t5_predictions.jsonl)
         max_new_tokens (int): Limit on output length (default: 2)
     """
-    # tok = AutoTokenizer.from_pretrained(model_name)
-    # mdl = AutoModelForSeq2SeqLM.from_pretrained(model_name)
-    tok = T5Tokenizer.from_pretrained("google/flan-t5-small") # use temporary to load faster change later!!
-    mdl = T5ForConditionalGeneration.from_pretrained("google/flan-t5-small")
+    tok = AutoTokenizer.from_pretrained(model_name)
+    mdl = AutoModelForSeq2SeqLM.from_pretrained(model_name)   
 
     Path(out_fp).parent.mkdir(parents=True, exist_ok=True)
 

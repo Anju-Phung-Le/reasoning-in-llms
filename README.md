@@ -1,2 +1,2 @@
 # reasoning-in-llms
-Testing different LLM models for presence of biases, using mainly google T5-families. Human vs. Logical reasoning.
+Repository for master thesis about reasoning in Large Language Models. Human reasoning vs. Logical reasoning.
