@@ -20,7 +20,7 @@ def build_prompt(item: dict) -> str:
     options = item["options"]
 
     # Build multiple-choice part, add indexes to options (e.g. 0,"Yes", 1"No", 2"Cannot determine")
-    option_text = "\n".join([f"{chr(65+i)}. {opt}" for i, opt in enumerate(options)])
+    option_text = "\n".join([f"{chr(65+i)}. {opt}" for i, opt in enumerate(options)]) # chr(65+i) converts int to ASCII character, 0:A, 1:B, 2:C
 
     prompt = (
         f"{role_text}"
