@@ -27,21 +27,21 @@ def main():
 
     # gen command - generate.py make_seed()
     p_gen = subparsers.add_parser("gen", help="Generate raw syllogism seeds.")
-    p_gen.add_argument("--n", type=int, required=True)
-    p_gen.add_argument("--templates", required=True)
-    p_gen.add_argument("--domains", required=True)
-    p_gen.add_argument("--out", required=True)
+    p_gen.add_argument("--n", type=int, required=True, help="Number of items to generate")
+    p_gen.add_argument("--templates", required=True, help="Syllogism templates JSON file")
+    p_gen.add_argument("--domains", required=True, help="Domains JSON file")
+    p_gen.add_argument("--out", required=True, help="Output JSONL file")
 
     args = parser.parse_args()
-
-    if args.cmd == "expand":
+    
+    if args.cmd == "gen":
+        make_seed(args.n, args.templates, args.domains, args.out)
+    elif args.cmd == "expand":
         expand_roles(args.inp, args.out)
     elif args.cmd == "predict":
         predict(args.model, args.data, args.out)
     elif args.cmd == "eval":
         evaluate(args.gold, args.pred, args.out)
-    elif args.cmd == "gen":
-        make_seed(args.n, args.templates, args.domains, args.out)
 
 if __name__ == "__main__":
     main()

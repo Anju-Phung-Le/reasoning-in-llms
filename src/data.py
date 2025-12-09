@@ -21,11 +21,11 @@ def expand_roles(in_fp, out_fp):
         items = [json.loads(l) for l in f] 
         out = []
     for item in items:
-        base_id = item.get("id") or str(uuid.uuid4())[:8]
+        base_id = item.get("id")
         for r in ROLES:
             x = dict(item)
             x["role"] = r
-            x["id"] = f"{base_id}_{r}"
+            x["id"] = f"{base_id}_{r}" # add role to the end of id
             out.append(x)
     Path(out_fp).parent.mkdir(parents=True, exist_ok=True)
     with open(out_fp, "w") as f:

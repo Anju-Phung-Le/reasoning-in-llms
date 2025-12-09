@@ -9,10 +9,10 @@
     },
     {
       "form": "EA3",
-      "premises": ["No {B} are {C}.", "All {B} are {A}."],
+      "premises": ["No {A} are {B}.", "All {C} are {B}."],
       "question": "Can we conclude: No {A} are {C}?",
       "options": ["Yes","No","Cannot determine"],
-      "label_classical": 2,
+      "label_classical": 0,
       "label_wcs": 2
     },
     {
@@ -29,7 +29,7 @@
       "question": "Can we conclude: Some {A} are not {C}?",
       "options": ["Yes","No","Cannot determine"],
       "label_classical": 0,
-      "label_wcs": 0
+      "label_wcs": 2
     }
   ]
   

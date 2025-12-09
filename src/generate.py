@@ -3,17 +3,15 @@ from pathlib import Path
 
 def _inst(template, A, B, C):
     """
-    Helper function to insert chosen terms (A, B, C) into the
-    syllogism template and format text for readability.
-    """
-    # Capitalize the first letter for consistent formatting
-    def cap(s): 
-        return s[0].upper() + s[1:] if s else s
+    Helper function takes syllogism template and fills in the placeholders {A}, {B}, {C}
+    with real words from domains.json.
 
+    Returns: the instantiated premises and question.
+    """
     # Replace placeholders {A}, {B}, {C} in premises and question
     prems = [p.format(A=A, B=B, C=C) for p in template["premises"]]
     q = template["question"].format(A=A, B=B, C=C)
-    return [cap(x) for x in prems], cap(q)
+    return [(x) for x in prems], (q)
 
 
 def make_seed(n_items: int,
@@ -22,17 +20,18 @@ def make_seed(n_items: int,
               out_fp: str,
               rnd_seed: int = 42):
     """
-    Generates a dataset of syllogism examples based on logical templates and domain terms.
+    Generates a dataset of syllogism examples 
+    based on syllogism templates and different domains.
 
     Each generated example is created by combining:
-      - one syllogism form (template) from configs/syllogism_templates.json
-      - one set of (A, B, C) terms sampled from src/domains.py
+      - one syllogism form (template) e.g. AA4, OA4 from configs/syllogism_templates.json
+      - one set of (A, B, C) terms sampled from configs/domains.json
 
     Args:
         n_items (int): Number of syllogism examples to generate.
         templates_path (str): Path to the JSON file containing syllogism templates.
-        out_fp (str): Path where the generated seed dataset will be saved.
-        rnd_seed (int): Random seed for reproducibility (default: 42).
+        out_fp (str): Output file.
+        rnd_seed (int): Random seed for reproducibility.
     """
 
     # Set random seed for reproducible generation

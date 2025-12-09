@@ -42,7 +42,17 @@ def predict(model_name: str, data_fp: str, out_fp: str, max_new_tokens: int = 2)
             out = mdl.generate(**enc, max_new_tokens=max_new_tokens, do_sample=False)
 
             # Decode prediction back to natural text
-            text = tok.decode(out[0], skip_special_tokens=True).strip()
+            if getattr(config, "is_encoder_decoder", False):
+                # Flan / T5: out already only contains generated tokens
+                gen_ids = out[0]
+            else:
+                # Causal LMs (Mistral, Deepseek, LLaMA):
+                # out = [prompt tokens][generated tokens]
+                input_len = enc["input_ids"].shape[1]
+                gen_ids = out[0][input_len:]
+
+            # Decode ONLY the generated tokens
+            text = tok.decode(gen_ids, skip_special_tokens=True).strip()
 
             # Extract predicted letter (A, B, C)
             letter = text[:1].upper()
