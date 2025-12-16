@@ -1,63 +1,95 @@
-from transformers import AutoTokenizer, AutoModelForSeq2SeqLM, AutoConfig, AutoModelForCausalLM
-from transformers import T5Tokenizer, T5ForConditionalGeneration
-from pathlib import Path
 import json
+from pathlib import Path
+
+import torch
+from transformers import AutoTokenizer, AutoModelForSeq2SeqLM, AutoConfig, AutoModelForCausalLM
+
 from .prompts import build_prompt
 
 LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
+
+def _single_token_id(tok, s: str):
+    ids = tok.encode(s, add_special_tokens=False)
+    return ids[0] if len(ids) == 1 else None
+
+
 def predict(model_name: str, data_fp: str, out_fp: str, max_new_tokens: int = 2):
-    """
-    Predicts using seq2seq model from (e.g. flan-t5 model.
-
-    Args:
-        model_name (str): Model id from Hugging Face (e.g., 'google/flan-t5-small')
-        data_fp (str): Path to processed dataset (dataset_v1.jsonl)
-        out_fp (str): Path to save predictions (flan_t5_predictions.jsonl)
-        max_new_tokens (int): Limit on output length (default: 2)
-    """
-     # load config to see what kind of model this is
     config = AutoConfig.from_pretrained(model_name)
-
     tok = AutoTokenizer.from_pretrained(model_name)
 
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
     if getattr(config, "is_encoder_decoder", False):
-        # T5 / Flan / other seq2seq
-        mdl = AutoModelForSeq2SeqLM.from_pretrained(model_name)
+        mdl = AutoModelForSeq2SeqLM.from_pretrained(model_name).to(device)
     else:
-        # decoder-only LMs like Mistral / LLaMA
-        mdl = AutoModelForCausalLM.from_pretrained(model_name)   
+        mdl = AutoModelForCausalLM.from_pretrained(
+            model_name,torch_dtype=torch.bfloat16,
+            device_map="auto",
+            low_cpu_mem_usage=True,)
+        if tok.pad_token is None:
+            tok.pad_token = tok.eos_token
+
+    mdl.eval()
 
     Path(out_fp).parent.mkdir(parents=True, exist_ok=True)
 
-    with open(data_fp) as fin, open(out_fp, "w") as fout:
+    with open(data_fp) as fin, open(out_fp, "w") as fout, torch.inference_mode():
         for line in fin:
             item = json.loads(line)
             prompt = build_prompt(item)
 
-            # Encode text for the model to read
-            enc = tok(prompt, return_tensors="pt")
-
-            # Generate prediction
-            out = mdl.generate(**enc, max_new_tokens=max_new_tokens, do_sample=False)
-
-            # Decode prediction back to natural text
             if getattr(config, "is_encoder_decoder", False):
-                # Flan / T5: out already only contains generated tokens
-                gen_ids = out[0]
+                enc = tok(prompt, return_tensors="pt").to(device)
+
+                out = mdl.generate(
+                    **enc,
+                    max_new_tokens=max_new_tokens,
+                    do_sample=False,
+                    pad_token_id=tok.eos_token_id,
+                )
+                text = tok.decode(out[0], skip_special_tokens=True).strip()
+
+                letter = text[:1].upper() if text else ""
+                idx = LETTERS.find(letter) if letter else -1
+                pred_index = idx if 0 <= idx < len(item["options"]) else -1
+
             else:
-                # Causal LMs (Mistral, Deepseek, LLaMA):
-                # out = [prompt tokens][generated tokens]
-                input_len = enc["input_ids"].shape[1]
-                gen_ids = out[0][input_len:]
+                # Use chat template for Instruct models (important for Mistral-Instruct)
+                if hasattr(tok, "apply_chat_template"):
+                    prompt = tok.apply_chat_template(
+                        [{"role": "user", "content": prompt}],
+                        tokenize=False,
+                        add_generation_prompt=True,
+                    )
 
-            # Decode ONLY the generated tokens
-            text = tok.decode(gen_ids, skip_special_tokens=True).strip()
+                enc = tok(prompt, return_tensors="pt", add_special_tokens=False)
 
-            # Extract predicted letter (A, B, C)
-            letter = text[:1].upper()
-            idx = LETTERS.find(letter)
-            pred_index = idx if 0 <= idx < len(item["options"]) else -1
+                input_device = mdl.get_input_embeddings().weight.device
+                enc = {k: v.to(input_device) for k, v in enc.items()}
+
+                # Score A/B/C directly from next-token logits
+                logits = mdl(**enc).logits[0, -1]  # vocab
+
+                # Try both "A" and " A" because some tokenizers prefer leading space
+                cand = {}
+                for L in ["A", "B", "C"]:
+                    tid = _single_token_id(tok, L)
+                    if tid is None:
+                        tid = _single_token_id(tok, " " + L)
+                    if tid is not None:
+                        cand[L] = tid
+
+                if not cand:
+                    # very unlikely, but fallback
+                    letter = ""
+                    pred_index = -1
+                    text = ""
+                else:
+                    scores = {L: logits[tid].item() for L, tid in cand.items()}
+                    letter = max(scores, key=scores.get)
+                    pred_index = "ABC".find(letter)
+                    text = letter  # keep pred_text as single letter
 
             fout.write(json.dumps({
                 "id": item["id"],

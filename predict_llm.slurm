@@ -23,14 +23,14 @@ module load nlpl-pytorch/2.1.2-foss-2022b-cuda-12.0.0-Python-3.10.8
 # WORKAROUND for protobuf / sentencepiece mismatch
 export PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python
 
-# 1) Generate: seed dataset
-python3 -m src.cli gen \
-  --n 150 \
-  --templates configs/syllogism_templates.json \
-  --domains configs/domains.json \
-  --out data/raw/seed.jsonl
+# 3) Predict: run Mistral-7B-Instruct-v0.3 on dataset
+python3 -m src.cli predict \
+  --model mistralai/Mistral-7B-Instruct-v0.3 \
+  --data data/processed/dataset_v1.jsonl \
+  --out data/predictions/mistral_7b_instruct_predictions.jsonl
 
-# 2) Expand: create full dataset
-python3 -m src.cli expand \
-  --in data/raw/seed.jsonl \
-  --out data/processed/dataset_v1.jsonl
+# 4) Eval: evaluate Mistral predictions
+python3 -m src.cli eval \
+  --gold data/processed/dataset_v1.jsonl \
+  --pred data/predictions/mistral_7b_instruct_predictions.jsonl \
+  --out outputs/mistral_7b_instruct_outputs_log.csv

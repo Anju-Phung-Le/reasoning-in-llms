@@ -9,7 +9,7 @@
 #SBATCH --mem=40G
 #SBATCH --exclude=gpu-14,gpu-15,gpu-16
 
-source ~/.bashrc || true
+source ~/.bashrc 
 
 # sanity: exit on all errors and disallow unset environment variables
 set -o errexit
@@ -34,15 +34,3 @@ python3 -m src.cli gen \
 python3 -m src.cli expand \
   --in data/raw/seed.jsonl \
   --out data/processed/dataset_v1.jsonl
-
-# 3) Predict: run Mistral-7B-Instruct-v0.3 on dataset
-python3 -m src.cli predict \
-  --model mistralai/Mistral-7B-Instruct-v0.3 \
-  --data data/processed/dataset_v1.jsonl \
-  --out data/predictions/mistral_7b_instruct_v0_3_predictions.jsonl
-
-# 4) Eval: evaluate Mistral predictions
-python3 -m src.cli eval \
-  --gold data/processed/dataset_v1.jsonl \
-  --pred data/predictions/mistral_7b_instruct_v0_3_predictions.jsonl \
-  --out outputs/mistral_7b_instruct_v0_3_outputs_log.csv
