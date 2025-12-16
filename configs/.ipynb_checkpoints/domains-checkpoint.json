@@ -1,0 +1,27 @@
+{
+    "animals": [
+      ["cats", "mammals", "pets"],
+      ["dogs", "mammals", "pets"],
+      ["sparrows", "birds", "animals"],
+      ["whales", "mammals", "animals"]
+    ],
+    "objects": [
+      ["cups", "containers", "kitchen-items"],
+      ["chairs", "furniture", "objects"],
+      ["cars", "vehicles", "machines"],
+      ["spoons", "utensils", "kitchen-items"]
+    ],
+    "people": [
+      ["students", "humans", "learners"],
+      ["teachers", "humans", "professionals"],
+      ["artists", "humans", "creatives"],
+      ["drivers", "humans", "workers"]
+    ],
+    "nature": [
+      ["roses", "flowers", "plants"],
+      ["trees", "plants", "organisms"],
+      ["mushrooms", "fungi", "organisms"],
+      ["sharks", "fish", "animals"]
+    ]
+  }
+  

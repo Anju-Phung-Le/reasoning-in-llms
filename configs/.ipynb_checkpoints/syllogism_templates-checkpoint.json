@@ -1,0 +1,35 @@
+[
+    {
+      "form": "AA4",
+      "premises": ["All {B} are {A}.", "All {B} are {C}."],
+      "question": "Are all all {A} {C}?",
+      "options": ["Yes","No","Cannot determine"],
+      "label_classical": 2,
+      "label_wcs": 0
+    },
+    {
+      "form": "EA3",
+      "premises": ["No {A} are {B}.", "All {C} are {B}."],
+      "question": "Are no {A} {C}?",
+      "options": ["Yes","No","Cannot determine"],
+      "label_classical": 0,
+      "label_wcs": 2
+    },
+    {
+      "form": "OA4",
+      "premises": ["Some {B} are not {A}.", "All {B} are {C}."],
+      "question": "Are some {C} not {A}?",
+      "options": ["Yes","No","Cannot determine"],
+      "label_classical": 0,
+      "label_wcs": 0
+    },
+    {
+      "form": "IE1",
+      "premises": ["Some {A} are {B}.", "No {B} are {C}."],
+      "question": "Are some {A} not {C}?",
+      "options": ["Yes","No","Cannot determine"],
+      "label_classical": 0,
+      "label_wcs": 2
+    }
+  ]
+  
