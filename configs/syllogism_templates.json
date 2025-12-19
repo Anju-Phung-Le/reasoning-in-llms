@@ -2,7 +2,7 @@
     {
       "form": "AA4",
       "premises": ["All {B} are {A}.", "All {B} are {C}."],
-      "question": "Are all all {A} {C}?",
+      "question": "Are all {A} {C}?",
       "options": ["Yes","No","Cannot determine"],
       "label_classical": 2,
       "label_wcs": 0
