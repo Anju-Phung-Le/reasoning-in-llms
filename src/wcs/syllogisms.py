@@ -1,5 +1,4 @@
-from wcs.tv import TV, l_and, l_implies, l_not
-
+from .tv import TV, l_and, l_implies, l_not, l_or
 def all_A_are_B(I, A, B):
     values = []
     o1 = 0
