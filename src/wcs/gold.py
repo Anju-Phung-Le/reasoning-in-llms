@@ -1,5 +1,5 @@
 from .encoders import build_program_for_form
-from .fixpoint import least_model
+from .leastmodel import least_model
 from .tv import TV
 from .syllogisms import all_A_are_B, no_A_are_B, some_A_are_B, some_A_are_not_B
 
