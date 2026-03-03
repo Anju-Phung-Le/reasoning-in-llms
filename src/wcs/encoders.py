@@ -2,7 +2,7 @@ from .program import Program
 from .tv import TV, l_and, l_or, l_not
 
 
-# Body helpers (callable logic bodies)
+# Body helpers 
 def atom(pred: str, obj: str):
     return lambda I: I.get(pred, obj)
 
@@ -15,9 +15,6 @@ def BOT():
 def AND(*bs):
     return lambda I: _and_eval(I, bs)
 
-def OR(*bs):
-    return lambda I: _or_eval(I, bs)
-
 def NOT(b):
     return lambda I: l_not(b(I))
 
@@ -25,12 +22,6 @@ def _and_eval(I, bs):
     v = TV.TRUE
     for b in bs:
         v = l_and(v, b(I))
-    return v
-
-def _or_eval(I, bs):
-    v = TV.FALSE
-    for b in bs:
-        v = l_or(v, b(I))
     return v
 
 
