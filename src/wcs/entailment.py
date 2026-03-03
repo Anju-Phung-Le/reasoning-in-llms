@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from typing import Dict, List, Set, Tuple
 
 from .encoders import build_program_for_form
-from .fixpoint import least_model
+from .leastmodel import least_model
 from .program import Program
 from .syllogisms import (
     all_A_are_B,
@@ -57,8 +57,29 @@ def run_wcs_program(P: Program, domain=None) -> WCSResult:
 
 def wcs_predict_form(form: str):
     P = build_program_for_form(form)
-    from .fixpoint import least_model
+    from .leastmodel import least_model
 
     I = least_model(P, domain=["o1", "o2", "o3"])
 
     return I
+
+
+def entailed_set_for_form(form: str, domain=None):
+    P, dom = build_program_for_form(form)  # make builder return (P, domain)
+    I = least_model(P, domain=dom if domain is None else domain)
+
+    entailed = set()
+    if all_A_are_B(I, "a", "c") == TV.TRUE: entailed.add("Aac")
+    if no_A_are_B(I,  "a", "c") == TV.TRUE: entailed.add("Eac")
+    if some_A_are_B(I,"a", "c") == TV.TRUE: entailed.add("Iac")
+    if some_A_are_not_B(I,"a","c") == TV.TRUE: entailed.add("Oac")
+
+    if all_A_are_B(I, "c", "a") == TV.TRUE: entailed.add("Aca")
+    if no_A_are_B(I,  "c", "a") == TV.TRUE: entailed.add("Eca")
+    if some_A_are_B(I,"c", "a") == TV.TRUE: entailed.add("Ica")
+    if some_A_are_not_B(I,"c","a") == TV.TRUE: entailed.add("Oca")
+
+    if len(entailed) == 0:
+        entailed.add("NVC")
+
+    return entailed
