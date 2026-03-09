@@ -21,15 +21,13 @@ def question_to_query(question: str):
         raise ValueError(f"Unrecognized question pattern: {question}")
 
     # detect term order by placeholders
-    # We rely on {A},{B},{C} being present in the original template.
-    # If you already format them to actual words, keep a parallel field or infer from 'form'.
+    # rely on {A},{B},{C} being present in the original template.
+    # If already format them to actual words, keep a parallel field or infer from 'form'.
     if "{a}" in q and "{c}" in q:
         left, right = "a", "c"
     elif "{c}" in q and "{a}" in q:
         left, right = "c", "a"
     else:
-        # fallback: many of your templates are always about A and C anyway
-        # but for robustness you'd keep placeholders before formatting
         raise ValueError(f"Cannot infer term placeholders from: {question}")
 
     return mood, left, right

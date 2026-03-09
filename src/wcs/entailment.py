@@ -1,6 +1,6 @@
 from __future__ import annotations
 from dataclasses import dataclass
-from typing import Dict, List, Set, Tuple
+from typing import Dict, Set
 
 from .encoders import build_program_for_form
 from .leastmodel import least_model

@@ -54,7 +54,7 @@ def run():
 
     if not ok:
         raise SystemExit("Sanity checks failed.")
-    print("All sanity checks passed!")
+    print("YAY all sanity checks passed!")
 
 if __name__ == "__main__":
     run()
