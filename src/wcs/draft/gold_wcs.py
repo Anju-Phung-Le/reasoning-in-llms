@@ -2,16 +2,16 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Dict, Set
 
-from .encoders import build_program_for_form
-from .leastmodel import least_model
-from .program import Program
-from .syllogisms import (
+from ..encoders import build_program_for_form
+from ..leastmodel import least_model
+from ..program import Program
+from ..syllogisms import (
     all_A_are_B,
     no_A_are_B,
     some_A_are_B,
     some_A_are_not_B,
 )
-from .tv import TV
+from ..tv import TV
 
 
 CONCLUSIONS_9 = ("Aac", "Eac", "Iac", "Oac", "Aca", "Eca", "Ica", "Oca", "NVC")
@@ -56,12 +56,7 @@ def run_wcs_program(P: Program, domain=None) -> WCSResult:
     return WCSResult(I=I, values=vals)
 
 def wcs_predict_form(form: str):
-    P = build_program_for_form(form)
-    from .leastmodel import least_model
-
-    I = least_model(P, domain=["o1", "o2", "o3"])
-
-    return I
+    return entailed_set_for_form(form)
 
 
 def entailed_set_for_form(form: str, domain=None):

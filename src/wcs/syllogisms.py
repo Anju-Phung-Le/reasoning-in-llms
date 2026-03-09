@@ -38,7 +38,7 @@ def some_A_are_B(I, A, B):
     if saw_A_true:
         return TV.FALSE
 
-    # If A is never TRUE but could be UNKNOWN, existential is UNKNOWN
+    # If A is never TRUE but could be UNKNOWN, existential is UNKNOWN - important for NVC cases.
     for x in I.domain:
         if I.get(A, x) == TV.UNKNOWN:
             return TV.UNKNOWN

@@ -21,7 +21,7 @@ def l_implies(a ,b):
     return TV(min(1.0, 1.0 - a.value + b.value))    
 
 
-# Interpretation with given domain
+# Interpretation with given domain and predicates
 class Interpretation:
     def __init__(self, domain):
         self.domain = domain

@@ -2,7 +2,7 @@ from .program import Program
 from .tv import TV, l_and, l_not
 
 
-# Body rules, section 2
+# Rules of bodies, mainly from section 2
 def atom(pred: str, obj: str):
     return lambda I: I.get(pred, obj)
 
@@ -33,7 +33,7 @@ def encode_A(P: Program, y: str, z: str, domain, o: str, ab_yz: str):
       ab_yz(X) <- ⊥
       y(o) <- ⊤
     """
-    # existential import/ Gricean Implcature
+    # Gricean Implcature / existential import
     P.add_rule(y, o, TOP())
     # licenses for inferences + abnormality
     for x in domain:
@@ -83,7 +83,7 @@ def encode_O(P: Program, y: str, z: str, domain, o1: str, o2: str, ab_y_nz: str,
       z0(X) <- y(X) ∧ ¬ab_y¬z(X)
       ab_y¬z(o1) <- ⊥        (restricted)
       z(X) <- ¬z0(X) ∧ ¬ab_¬z z(X)
-      y(o1) <- ⊤
+      y(o1) <- ⊤             (Gricean implicature/ existential import)
       y(o2) <- ⊤             (unknown generalization)
       ab_¬z z(o1) <- ⊥        (restricted to o1,o2)
       ab_¬z z(o2) <- ⊥
@@ -105,19 +105,18 @@ def encode_O(P: Program, y: str, z: str, domain, o1: str, o2: str, ab_y_nz: str,
     P.add_rule(ab_nz_z, o2, BOT())
 
 
-# Form -> Program (supports all 64)
 def figure_pairs(fig: int):
     """
     Returns (prem1_pair, prem2_pair) where each pair is (subject, predicate).
     Terms are always among {a,b,c}.
     """
-    if fig == 1:  # M-P, S-M
+    if fig == 1:  
         return (("a", "b"), ("b", "c"))
-    if fig == 2:  # P-M, S-M
+    if fig == 2:  
         return (("b", "a"), ("c", "b"))
-    if fig == 3:  # M-P, M-S
+    if fig == 3:  
         return (("a", "b"), ("c", "b"))
-    if fig == 4:  # P-M, M-S
+    if fig == 4:  
         return (("b", "a"), ("b", "c"))
     raise ValueError(f"Invalid figure: {fig}")
 
@@ -142,14 +141,14 @@ def _ab_names_for_premise(prem_idx: int, y: str, z: str, mood: str):
     if mood in ("A", "I"):
         return (f"ab{prem_idx}_{y}{z}",)
     if mood in ("E", "O"):
-        # two ab predicates (paper’s y¬z and ¬z z)
+        # two ab predicates (paper’s y¬z and ¬zz)
         return (f"ab{prem_idx}_{y}n{z}", f"ab{prem_idx}_n{z}{z}")
     raise ValueError(mood)
 
 
 def add_premise(P: Program, mood: str, y: str, z: str, domain, objs, prem_idx: int):
     """
-    Dispatch into the correct encoder with the right objects/abnormalities.
+    Sort out the correct encoder with the right objects/abnormalities.
     """
     if mood == "A":
         (ab_yz,) = _ab_names_for_premise(prem_idx, y, z, mood)
@@ -185,20 +184,23 @@ def build_program_for_form(form: str):
     """
     if len(form) != 3:
         raise ValueError(f"Expected form like 'OA4', got: {form}")
-
+    
+    # parse form into mood1, mood2, figure
     mood1, mood2, fig_ch = form[0], form[1], form[2]
     if fig_ch not in "1234":
         raise ValueError(f"Invalid figure in form: {form}")
     fig = int(fig_ch)
 
+    # use figure pairs
     (y1, z1), (y2, z2) = figure_pairs(fig)
 
-    # Allocate objects separately per premise ("rename objects")
+    # rename objects
     idx = 1
     objs1, idx = objs_for_mood(mood1, idx)
     objs2, idx = objs_for_mood(mood2, idx)
 
-    domain = objs1 + objs2  # ground over all objects used
+    # create domain as union of objects needed for both premises
+    domain = objs1 + objs2 
 
     P = Program()
     add_premise(P, mood=mood1, y=y1, z=z1, domain=domain, objs=objs1, prem_idx=1)
