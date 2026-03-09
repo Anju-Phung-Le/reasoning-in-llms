@@ -5,7 +5,7 @@ from .program import Program
 
 def least_model(P: Program, domain=None, max_iters: int = 1000) -> Interpretation:
     """
-    Compute least L-model of the weak completion using the Φ operator (paper Section 2.3).
+    Compute least L-model of the weak completion using the Φ operator (fixed operator) (Section 2.3).
     - Start with all atoms UNKNOWN
     - Iterate:
         TRUE  if some defining body is TRUE
@@ -19,7 +19,7 @@ def least_model(P: Program, domain=None, max_iters: int = 1000) -> Interpretatio
 
     I = Interpretation(dom)
 
-    # Iterate to fixpoint
+    # Iterate to a fixpoint
     for _ in range(max_iters):
         changed = False
 

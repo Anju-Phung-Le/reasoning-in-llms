@@ -1,8 +1,8 @@
 from .program import Program
-from .tv import TV, l_and, l_or, l_not
+from .tv import TV, l_and, l_not
 
 
-# Body helpers 
+# Body rules, section 2
 def atom(pred: str, obj: str):
     return lambda I: I.get(pred, obj)
 
@@ -18,6 +18,7 @@ def AND(*bs):
 def NOT(b):
     return lambda I: l_not(b(I))
 
+# evaluates the whole AND expressions (bs is a list of body statements)
 def _and_eval(I, bs):
     v = TV.TRUE
     for b in bs:
@@ -27,18 +28,38 @@ def _and_eval(I, bs):
 
 def encode_A(P: Program, y: str, z: str, domain, o: str, ab_yz: str):
     """
-    PAyz (paper 4.1):
+      PAyz (paper 4.1):
       z(X)  <- y(X) ∧ ¬ab_yz(X)
       ab_yz(X) <- ⊥
       y(o) <- ⊤
     """
-    # existential import
+    # existential import/ Gricean Implcature
     P.add_rule(y, o, TOP())
-    # licenses for inferences + abnormality default
+    # licenses for inferences + abnormality
     for x in domain:
         P.add_rule(ab_yz, x, BOT())
         P.add_rule(z, x, AND(atom(y, x), NOT(atom(ab_yz, x))))
 
+def encode_E(P: Program, y: str, z: str, domain, o: str, ab_y_nz: str, ab_nz_z: str):
+    """
+    PEyz (paper 4.2) with negation-by-transformation:
+      z0(X) <- y(X) ∧ ¬ab_y¬z(X)
+      ab_y¬z(X) <- ⊥
+      z(X) <- ¬z0(X) ∧ ¬ab_¬z z(X)
+      y(o) <- ⊤
+      ab_¬zz(o) <- ⊥   (restricted to o to avoid double negation effects)
+    """
+    z0 = f"{z}0"  # auxiliary formula for negation-by-transformation
+
+    P.add_rule(y, o, TOP())
+
+    for x in domain:
+        P.add_rule(ab_y_nz, o, BOT())
+        P.add_rule(z0, x, AND(atom(y, x), NOT(atom(ab_y_nz, x))))
+        P.add_rule(z,  x, AND(NOT(atom(z0, x)), NOT(atom(ab_nz_z, x))))
+
+    # restricted abnormality clause (only for the existential object o)
+    P.add_rule(ab_nz_z, o, BOT())
 
 def encode_I(P: Program, y: str, z: str, domain, o1: str, o2: str, ab_yz: str):
     """
@@ -56,28 +77,6 @@ def encode_I(P: Program, y: str, z: str, domain, o1: str, o2: str, ab_yz: str):
         P.add_rule(z, x, AND(atom(y, x), NOT(atom(ab_yz, x))))
 
 
-def encode_E(P: Program, y: str, z: str, domain, o: str, ab_y_nz: str, ab_nz_z: str):
-    """
-    PEyz (paper 4.2) with negation-by-transformation:
-      z0(X) <- y(X) ∧ ¬ab_y¬z(X)
-      ab_y¬z(X) <- ⊥
-      z(X) <- ¬z0(X) ∧ ¬ab_¬z z(X)
-      y(o) <- ⊤
-      ab_¬z z(o) <- ⊥   (restricted to o to avoid double negation effects)
-    """
-    z0 = f"{z}0"  # auxiliary predicate symbol (paper: z^0)
-
-    P.add_rule(y, o, TOP())
-
-    for x in domain:
-        P.add_rule(ab_y_nz, o, BOT())
-        P.add_rule(z0, x, AND(atom(y, x), NOT(atom(ab_y_nz, x))))
-        P.add_rule(z,  x, AND(NOT(atom(z0, x)), NOT(atom(ab_nz_z, x))))
-
-    # restricted abnormality clause (only for the existential object o)
-    P.add_rule(ab_nz_z, o, BOT())
-
-
 def encode_O(P: Program, y: str, z: str, domain, o1: str, o2: str, ab_y_nz: str, ab_nz_z: str):
     """
     POyz (paper 4.4):
@@ -89,7 +88,7 @@ def encode_O(P: Program, y: str, z: str, domain, o1: str, o2: str, ab_y_nz: str,
       ab_¬z z(o1) <- ⊥        (restricted to o1,o2)
       ab_¬z z(o2) <- ⊥
     """
-    z0 = f"{z}0"
+    z0 = f"{z}0" # auxiliary formula for negation-by-transformation
 
     P.add_rule(y, o1, TOP())
     P.add_rule(y, o2, TOP())
@@ -137,7 +136,7 @@ def objs_for_mood(mood: str, start: int):
 
 def _ab_names_for_premise(prem_idx: int, y: str, z: str, mood: str):
     """
-    Create unique abnormality predicate names per premise.
+    Create abnormality predicate names per premise.
     prem_idx in {1,2} to avoid collisions between premises.
     """
     if mood in ("A", "I"):
@@ -194,7 +193,7 @@ def build_program_for_form(form: str):
 
     (y1, z1), (y2, z2) = figure_pairs(fig)
 
-    # Allocate objects separately per premise (paper-style "rename objects")
+    # Allocate objects separately per premise ("rename objects")
     idx = 1
     objs1, idx = objs_for_mood(mood1, idx)
     objs2, idx = objs_for_mood(mood2, idx)

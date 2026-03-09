@@ -7,18 +7,18 @@ class TV(Enum):
     UNKNOWN = 0.5
 
 
-# Simple logical operations
+# Simple logical operations in this world 
 def l_not(v):
     return TV(1.0-v.value)
 
 def l_and(a, b):
-    return TV(min(a.value, b.value))
+    return TV(min(a.value, b.value))    
 
 def l_or(a, b):
     return TV(max(a.value, b.value))
 
 def l_implies(a ,b):
-    return TV(min(1.0, 1.0 - a.value + b.value))
+    return TV(min(1.0, 1.0 - a.value + b.value))    
 
 
 # Interpretation with given domain
