@@ -7,7 +7,7 @@ class TV(Enum):
     UNKNOWN = 0.5
 
 
-# Simple logical operations in this world 
+# Simple logical operations
 def l_not(v):
     return TV(1.0-v.value)
 

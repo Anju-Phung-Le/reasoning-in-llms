@@ -19,7 +19,7 @@ def least_model(P: Program, domain=None, max_iters: int = 1000) -> Interpretatio
 
     I = Interpretation(dom)
 
-    # Iterate to a fixpoint
+    # Iterate to a fixpoint, keeps iterating until no changes or max_iters reached
     for _ in range(max_iters):
         changed = False
 
@@ -27,19 +27,20 @@ def least_model(P: Program, domain=None, max_iters: int = 1000) -> Interpretatio
             # (after weak completion, each head has exactly 1 body, but keep list form)
             vals = [b(I) for b in bodies]
 
-            if any(v == TV.TRUE for v in vals):
+            if any(v == TV.TRUE for v in vals): # if some body is TRUE, head is TRUE
                 new_val = TV.TRUE
-            elif all(v == TV.FALSE for v in vals):
+            elif all(v == TV.FALSE for v in vals): # if all bodies are FALSE, head is FALSE
                 new_val = TV.FALSE
             else:
-                new_val = TV.UNKNOWN
+                new_val = TV.UNKNOWN # otherwise, head is UNKNOWN
 
             old_val = I.get(pred, obj)
             if new_val != old_val:
                 I.set(pred, obj, new_val)
                 changed = True
 
-        if not changed:
+    # If no changes, we have reached a fixpoint and can return the interpretation
+        if not changed: 
             return I
 
     raise RuntimeError("least_model did not converge (max_iters reached)")

@@ -52,9 +52,8 @@ def encode_E(P: Program, y: str, z: str, domain, o: str, ab_y_nz: str, ab_nz_z: 
     z0 = f"{z}0"  # auxiliary formula for negation-by-transformation
 
     P.add_rule(y, o, TOP())
-
+    P.add_rule(ab_y_nz, o, BOT())
     for x in domain:
-        P.add_rule(ab_y_nz, o, BOT())
         P.add_rule(z0, x, AND(atom(y, x), NOT(atom(ab_y_nz, x))))
         P.add_rule(z,  x, AND(NOT(atom(z0, x)), NOT(atom(ab_nz_z, x))))
 

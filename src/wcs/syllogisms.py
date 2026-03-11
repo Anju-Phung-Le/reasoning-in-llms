@@ -20,8 +20,8 @@ def no_A_are_B(I, A, B):
     return TV(min(min(v.value for v in values), o1))
 
 def some_A_are_B(I, A, B):
-    saw_A_true = False
-    saw_unknown_witness = False
+    saw_A_true = False # did we ever find an A that is TRUE?
+    saw_unknown_witness = False # did we find an A that is TRUE but B is UNKNOWN for that same A?
 
     for x in I.domain:
         a = I.get(A, x)
