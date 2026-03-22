@@ -14,6 +14,54 @@ def _inst(template, A, B, C):
     return [(x) for x in prems], (q)
 
 
+def question_to_conclusion(question: str) -> str:
+    """
+    Map the question text string to the conclusion code (e.g., 'Aac').
+    """
+    if "all {A} {C}" in question:
+        return "Aac"
+    elif "no {A} {C}" in question:
+        return "Eac"
+    elif "some {A} {C}" in question:
+        return "Iac"
+    elif "some {A} not {C}" in question:
+        return "Oac"
+    elif "some {C} {A}" in question:
+        return "Ica"
+    elif "some {C} not {A}" in question:
+        return "Oca"
+    elif "all {C} {A}" in question:
+        return "Aca"
+    elif "no {C} {A}" in question:
+        return "Eca"
+    else:
+        raise ValueError(f"Unknown question format: {question}")
+
+
+def compute_wcs_label(form: str, question: str) -> int:
+    """
+    Compute the WCS label (0/1/2) for the given form and question.
+    """
+    from wcs.gold_wcs import check_9_conclusions
+    from wcs.encoders import build_program_for_form
+    from wcs.leastmodel import least_model
+    from wcs.tv import TV
+
+    P, domain = build_program_for_form(form)
+    I = least_model(P, domain=domain)
+    vals = check_9_conclusions(I, a="a", c="c")
+
+    conc = question_to_conclusion(question)
+    tv = vals[conc]
+
+    if tv == TV.TRUE:
+        return 0  # Yes
+    elif tv == TV.FALSE:
+        return 1  # No
+    else:
+        return 2  # Cannot determine
+
+
 def make_seed(n_items: int,
               templates_path: str,
               domains_path: str, 
@@ -67,7 +115,7 @@ def make_seed(n_items: int,
             "question": question,                     
             "options": tmpl["options"],               
             "label_classical": tmpl["label_classical"],
-            "label_wcs": tmpl["label_wcs"],           
+            "label_wcs": compute_wcs_label(tmpl["form"], tmpl["question"]),           
             "role": "none",                           
             "domain": dom,                            
             "form": tmpl["form"]                      

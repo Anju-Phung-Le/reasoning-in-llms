@@ -2,7 +2,7 @@ from .program import Program
 from .tv import TV, l_and, l_not
 
 
-# Rules of bodies, mainly from section 2
+# Rules of bodies, mainly section 2 TODO: check other sections
 def atom(pred: str, obj: str):
     return lambda I: I.get(pred, obj)
 
@@ -18,7 +18,7 @@ def AND(*bs):
 def NOT(b):
     return lambda I: l_not(b(I))
 
-# evaluates the whole AND expressions (bs is a list of body statements)
+# evaluates the whole AND expressions (bs: list of body statements)
 def _and_eval(I, bs):
     v = TV.TRUE
     for b in bs:
