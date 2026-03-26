@@ -16,13 +16,12 @@ from .tv import TV
 
 CONCLUSIONS_9 = ("Aac", "Eac", "Iac", "Oac", "Aca", "Eca", "Ica", "Oca", "NVC")
 
+# Mapping
 def check_9_conclusions(I, a: str = "a", c: str = "c") -> Dict[str, TV]:
     """
-    Evaluate all 9 possible conclusions for a given interpretation I.
-
-    This function checks the 8 standard categorical conclusions and NVC.
+    Evaluate all 9 possible conclusions for a given interpretation I (8 standard conclusions and NVC).
     Each conclusion is evaluated using the syllogism predicates from syllogisms.py,
-    which return TRUE, FALSE, or UNKNOWN based on the model's domain and assignments.
+    which return TRUE, FALSE, or UNKNOWN.
 
     Parameters:
     - I: The interpretation (model) from least_model, containing domain and predicate assignments.
@@ -55,7 +54,7 @@ def check_9_conclusions(I, a: str = "a", c: str = "c") -> Dict[str, TV]:
     out["NVC"] = TV.TRUE if all(v != TV.TRUE for k, v in out.items()) else TV.FALSE
     return out
 
-
+#Return set of mapped labels
 @dataclass
 class WCSResult:
     """
@@ -68,7 +67,7 @@ class WCSResult:
     Methods:
     - entailed_labels(): Returns the set of labels that are TRUE.
     """
-    I: object  # The least model interpretation
+    I: object  # Least model interpretation
     values: Dict[str, TV]  # Conclusion values
 
     def entailed_labels(self) -> Set[str]:
@@ -78,15 +77,13 @@ class WCSResult:
 
 def run_wcs_program(P: Program, domain=None) -> WCSResult:
     """
-    Run a full WCS evaluation on a given program.
-
-    This is the point for evaluating a WCS program:
+    Runs full WCS evaluation on a given program.
     1. Compute the least model using leastmodel.py.
     2. Evaluate all 9 conclusions using check_9_conclusions.
 
     Parameters:
     - P: The WCS program (from program.py).
-    - domain: Optional domain override (list of objects).
+    - domain: Optional domain (list of objects).
 
     Returns:
     - WCSResult: Contains the model I and the conclusion values.
@@ -104,31 +101,23 @@ def run_wcs_program(P: Program, domain=None) -> WCSResult:
 def wcs_predict_form(form: str):
     """
     Predict the entailed conclusions for a syllogism form.
-
-    This is a simple wrapper around entailed_set_for_form for API consistency.
+    Simple wrapper around entailed_set_for_form.
 
     Parameters:
     - form: Syllogism form string (e.g., "AA1").
-
     Returns:
     - Set[str]: Entailed conclusion labels.
     """
     return entailed_set_for_form(form)
 
 
-def entailed_set_for_form(form: str, domain=None):
+def entailed_set_for_form(form: str, domain=None) -> Set[str]:
     """
-    Compute the set of entailed conclusion labels for a given syllogism form.
-
-    This is the core gold label function:
-    1. Build the WCS program for the form using encoders.py.
-    2. Compute the least model using leastmodel.py.
-    3. Evaluate each of the 8 categorical conclusions.
-    4. If none are TRUE, add "NVC" to the set.
+    Wrapper around run_wcs_program that extracts the entailed labels.
 
     Parameters:
     - form: Syllogism form (e.g., "AA1", "EO2").
-    - domain: Optional domain override.
+    - domain: Optional domain (list of objects).
 
     Returns:
     - Set[str]: Set of entailed labels. Either specific conclusions (e.g., {"Aac"}) or {"NVC"}.
@@ -138,26 +127,6 @@ def entailed_set_for_form(form: str, domain=None):
     - UNKNOWN conclusions are not included (WCS is cautious).
     - NVC indicates the syllogism does not entail any definite conclusion.
     """
-    # Build the WCS program and domain for the form
     P, dom = build_program_for_form(form)
-
-    # Compute the least model (this is the "reasoning" step)
-    I = least_model(P, domain=dom if domain is None else domain)
-
-    # Check each conclusion and collect those that are TRUE
-    entailed = set()
-    if all_A_are_B(I, "a", "c") == TV.TRUE: entailed.add("Aac")
-    if no_A_are_B(I,  "a", "c") == TV.TRUE: entailed.add("Eac")
-    if some_A_are_B(I,"a", "c") == TV.TRUE: entailed.add("Iac")
-    if some_A_are_not_B(I,"a","c") == TV.TRUE: entailed.add("Oac")
-
-    if all_A_are_B(I, "c", "a") == TV.TRUE: entailed.add("Aca")
-    if no_A_are_B(I,  "c", "a") == TV.TRUE: entailed.add("Eca")
-    if some_A_are_B(I,"c", "a") == TV.TRUE: entailed.add("Ica")
-    if some_A_are_not_B(I,"c","a") == TV.TRUE: entailed.add("Oca")
-
-    # If no conclusions are TRUE, the syllogism has No Valid Conclusion
-    if len(entailed) == 0:
-        entailed.add("NVC")
-
-    return entailed
+    result = run_wcs_program(P, domain=dom if domain is None else domain)
+    return result.entailed_labels()

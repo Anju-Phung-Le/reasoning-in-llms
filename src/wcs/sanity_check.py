@@ -1,7 +1,7 @@
 from wcs.encoders import build_program_for_form
 from wcs.leastmodel import least_model
 from wcs.tv import TV
-from src.wcs.gold_wcs import entailed_set_for_form
+from wcs.gold_wcs import entailed_set_for_form
 from wcs.syllogisms import (
     all_A_are_B, no_A_are_B, some_A_are_B, some_A_are_not_B
 )

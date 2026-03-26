@@ -1,5 +1,6 @@
 # reasoning-in-llms
 Repository for master thesis about reasoning in Large Language Models. Human reasoning vs. Logical reasoning.
+Prerquisities: transformer needs to be installed
 # Generate seeds
 python -m src.cli gen \
   --n 150 \
