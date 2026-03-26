@@ -62,7 +62,7 @@ class WCSResult:
 
     Attributes:
     - I: The computed least model (interpretation).
-    - values: Dict of conclusion labels to their TV values (from check_9_conclusions).
+    - values: Dict of conclusion labels to their TV (from check_9_conclusions).
 
     Methods:
     - entailed_labels(): Returns the set of labels that are TRUE.
@@ -102,9 +102,6 @@ def wcs_predict_form(form: str):
     """
     Predict the entailed conclusions for a syllogism form.
     Simple wrapper around entailed_set_for_form.
-
-    Parameters:
-    - form: Syllogism form string (e.g., "AA1").
     Returns:
     - Set[str]: Entailed conclusion labels.
     """
@@ -130,3 +127,5 @@ def entailed_set_for_form(form: str, domain=None) -> Set[str]:
     P, dom = build_program_for_form(form)
     result = run_wcs_program(P, domain=dom if domain is None else domain)
     return result.entailed_labels()
+
+# TODO: use these results to generate dataset for all 64 forms. 

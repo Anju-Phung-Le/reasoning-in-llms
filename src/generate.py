@@ -42,10 +42,10 @@ def compute_wcs_label(form: str, question: str) -> int:
     """
     Compute the WCS label (0/1/2) for the given form and question.
     """
-    from wcs.gold_wcs import check_9_conclusions
-    from wcs.encoders import build_program_for_form
-    from wcs.leastmodel import least_model
-    from wcs.tv import TV
+    from .wcs.gold_wcs import check_9_conclusions
+    from .wcs.encoders import build_program_for_form
+    from .wcs.leastmodel import least_model
+    from .wcs.tv import TV
 
     P, domain = build_program_for_form(form)
     I = least_model(P, domain=domain)
