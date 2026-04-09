@@ -1,22 +1,18 @@
 {
   "AA1": [
     "Aac",
-    "Iac",
     "Ica"
   ],
   "AA2": [
     "Aca",
-    "Iac",
-    "Ica"
+    "Iac"
   ],
   "AA3": [
     "NVC"
   ],
   "AA4": [
     "Aac",
-    "Aca",
-    "Iac",
-    "Ica"
+    "Aca"
   ],
   "AE1": [
     "NVC"
@@ -42,8 +38,7 @@
   ],
   "AI4": [
     "Aca",
-    "Iac",
-    "Ica"
+    "Iac"
   ],
   "AO1": [
     "NVC"
@@ -117,7 +112,6 @@
   ],
   "IA4": [
     "Aac",
-    "Iac",
     "Ica"
   ],
   "IE1": [

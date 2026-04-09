@@ -72,9 +72,8 @@ def encode_I(P: Program, y: str, z: str, domain, o1: str, o2: str, ab_yz: str):
     P.add_rule(y, o1, TOP())
     P.add_rule(y, o2, TOP())
     P.add_rule(ab_yz, o1, BOT())
-    for x in domain: # TODO run this later to check for existential conclusions in AA4
-        if AND(atom(y, x), NOT(atom(ab_yz, x))) == TOP():
-            P.add_rule(z, x, TOP())
+    for x in domain:
+        P.add_rule(z, x, AND(atom(y, x), NOT(atom(ab_yz, x))))
 
 
 def encode_O(P: Program, y: str, z: str, domain, o1: str, o2: str, ab_y_nz: str, ab_nz_z: str):

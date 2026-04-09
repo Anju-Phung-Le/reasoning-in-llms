@@ -45,10 +45,23 @@ def check_9_conclusions(I, a: str = "a", c: str = "c") -> Dict[str, TV]:
     out["Iac"] = some_A_are_B(I, a, c)
     out["Oac"] = some_A_are_not_B(I, a, c)
 
-    out["Aca"] = all_A_are_B(I, c, a)
+    out["Aca"] = all_A_are_B(I, c, a) 
     out["Eca"] = no_A_are_B(I, c, a)
     out["Ica"] = some_A_are_B(I, c, a)
     out["Oca"] = some_A_are_not_B(I, c, a)
+
+    #   A  ⊃  I   ("All" subsumes "Some")
+    #   E  ⊃  O   ("No"  subsumes "Some … not")
+    # This is subalternation in traditional logic, so if Aac is TRUE, then Iac must be FALSE 
+    # (since WCS is cautious and does not infer UNKNOWN as TRUE).
+    if out["Aac"] == TV.TRUE:
+        out["Iac"] = TV.FALSE
+    if out["Aca"] == TV.TRUE:
+        out["Ica"] = TV.FALSE
+    if out["Eac"] == TV.TRUE:
+        out["Oac"] = TV.FALSE
+    if out["Eca"] == TV.TRUE:
+        out["Oca"] = TV.FALSE
 
     # NVC: ONLY IF none of the 8 are TRUE
     out["NVC"] = TV.TRUE if all(v != TV.TRUE for k, v in out.items()) else TV.FALSE
@@ -88,7 +101,7 @@ def run_wcs_program(P: Program, domain=None) -> WCSResult:
     Returns:
     - WCSResult: Contains the model I and the conclusion values.
 
-    Example:
+    f.eks:
     >>> P, dom = build_program_for_form("AA1")
     >>> result = run_wcs_program(P, domain=dom)
     >>> print(result.entailed_labels())  # e.g., {"Aac", "Iac"}
@@ -100,7 +113,6 @@ def run_wcs_program(P: Program, domain=None) -> WCSResult:
 
 def wcs_predict_form(form: str):
     """
-    Predict the entailed conclusions for a syllogism form.
     Simple wrapper around entailed_set_for_form.
     Returns:
     - Set[str]: Entailed conclusion labels.

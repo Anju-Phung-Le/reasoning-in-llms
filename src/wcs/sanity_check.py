@@ -82,7 +82,6 @@ def save_all_forms_json(out_path: str = "data/processed/wcs_gold_table.json"):
     print(f"Saved WCS gold table to {out_path}")
     return out_path
 
-
 if __name__ == "__main__":
     run()
     save_all_forms_json()
