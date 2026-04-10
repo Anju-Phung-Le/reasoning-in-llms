@@ -1,6 +1,65 @@
 import json, random, uuid
 from pathlib import Path
 
+
+# Natural-language patterns for premise moods
+_MOOD_PREMISE = {
+    "A": "All {S} are {P}.",
+    "E": "No {S} are {P}.",
+    "I": "Some {S} are {P}.",
+    "O": "Some {S} are not {P}.",
+}
+
+# Figure determines how A (end term), B (middle term), C (end term)
+# map to subject/predicate in each premise.
+_FIGURE_SP = {
+    1: (("{A}", "{B}"), ("{B}", "{C}")),
+    2: (("{B}", "{A}"), ("{C}", "{B}")),
+    3: (("{A}", "{B}"), ("{C}", "{B}")),
+    4: (("{B}", "{A}"), ("{B}", "{C}")),
+}
+
+# All 8 possible conclusion questions
+_CONCLUSION_Q = {
+    "Aac": "Are all {A} {C}?",
+    "Eac": "Are no {A} {C}?",
+    "Iac": "Are some {A} {C}?",
+    "Oac": "Are some {A} not {C}?",
+    "Aca": "Are all {C} {A}?",
+    "Eca": "Are no {C} {A}?",
+    "Ica": "Are some {C} {A}?",
+    "Oca": "Are some {C} not {A}?",
+}
+
+
+def build_all_form_templates():
+    """
+    Programmatically generate templates for all 64 syllogistic forms × 8 conclusions.
+    Returns a list of 512 template dicts, each with the same shape as syllogism_templates.json.
+    """
+    moods = ["A", "E", "I", "O"]
+    templates = []
+
+    for m1 in moods:
+        for m2 in moods:
+            for fig in range(1, 5):
+                form = f"{m1}{m2}{fig}"
+                (s1, p1), (s2, p2) = _FIGURE_SP[fig]
+
+                prem1 = _MOOD_PREMISE[m1].format(S=s1, P=p1)
+                prem2 = _MOOD_PREMISE[m2].format(S=s2, P=p2)
+
+                for conc_code, question in _CONCLUSION_Q.items():
+                    templates.append({
+                        "form": form,
+                        "premises": [prem1, prem2],
+                        "question": question,
+                        "options": ["Yes", "No", "Cannot determine"],
+                        "conclusion": conc_code,
+                    })
+
+    return templates
+
 def _inst(template, A, B, C):
     """
     Helper function takes syllogism template and fills in the placeholders {A}, {B}, {C}
@@ -131,3 +190,46 @@ def make_seed(n_items: int,
             f.write(json.dumps(x, ensure_ascii=False) + "\n")
 
     print(f"Wrote {len(items)} seeds to {out_fp}")
+
+
+def make_seed_all_forms(domains_path: str, out_fp: str):
+    """
+    Generate an exhaustive dataset covering all 64 forms × 8 conclusions × all domain triplets.
+    No random sampling — every combination is included exactly once.
+    """
+    templates = build_all_form_templates()
+
+    with open(domains_path) as f:
+        domains = json.load(f)
+
+    triples = []
+    for dom, rows in domains.items():
+        for (A, B, C) in rows:
+            triples.append((dom, A, B, C))
+
+    items = []
+    for tmpl in templates:
+        for dom, A, B, C in triples:
+            premises, question = _inst(tmpl, A, B, C)
+
+            item = {
+                "id": f"ex{uuid.uuid4().hex[:8]}",
+                "premises": premises,
+                "question": question,
+                "options": tmpl["options"],
+                "conclusion": tmpl["conclusion"],
+                "label_wcs": compute_wcs_label(tmpl["form"], tmpl["question"]),
+                "role": "none",
+                "domain": dom,
+                "form": tmpl["form"],
+            }
+            items.append(item)
+
+    Path(out_fp).parent.mkdir(parents=True, exist_ok=True)
+
+    with open(out_fp, "w") as f:
+        for x in items:
+            f.write(json.dumps(x, ensure_ascii=False) + "\n")
+
+    print(f"Wrote {len(items)} seeds to {out_fp} "
+          f"(64 forms × 8 conclusions × {len(triples)} domain triplets)")

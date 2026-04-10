@@ -2,7 +2,7 @@ import argparse
 from .data import expand_roles
 from .infer import predict
 from .eval import evaluate
-from .generate import make_seed
+from .generate import make_seed, make_seed_all_forms
 
 def main():
     parser = argparse.ArgumentParser(description="Run data or model tasks.")
@@ -27,15 +27,22 @@ def main():
 
     # gen command - generate.py make_seed()
     p_gen = subparsers.add_parser("gen", help="Generate raw syllogism seeds.")
-    p_gen.add_argument("--n", type=int, required=True, help="Number of items to generate")
-    p_gen.add_argument("--templates", required=True, help="Syllogism templates JSON file")
+    p_gen.add_argument("--n", type=int, help="Number of items to generate (required with --templates)")
+    p_gen.add_argument("--templates", help="Syllogism templates JSON file (mutually exclusive with --all-forms)")
+    p_gen.add_argument("--all-forms", action="store_true", dest="all_forms",
+                       help="Generate all 64 forms × 8 conclusions × all domain triplets")
     p_gen.add_argument("--domains", required=True, help="Domains JSON file")
     p_gen.add_argument("--out", required=True, help="Output JSONL file")
 
     args = parser.parse_args()
     
     if args.cmd == "gen":
-        make_seed(args.n, args.templates, args.domains, args.out)
+        if args.all_forms:
+            make_seed_all_forms(args.domains, args.out)
+        elif args.templates and args.n:
+            make_seed(args.n, args.templates, args.domains, args.out)
+        else:
+            parser.error("gen requires either --all-forms or --templates with --n")
     elif args.cmd == "expand":
         expand_roles(args.inp, args.out)
     elif args.cmd == "predict":
