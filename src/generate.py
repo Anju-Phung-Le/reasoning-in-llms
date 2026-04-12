@@ -1,5 +1,9 @@
 import json, random, uuid
 from pathlib import Path
+from .wcs.gold_wcs import check_9_conclusions
+from .wcs.encoders import build_program_for_form
+from .wcs.leastmodel import least_model
+from .wcs.tv import TV
 
 
 # Natural-language patterns for premise moods
@@ -34,7 +38,7 @@ _CONCLUSION_Q = {
 
 def build_all_form_templates():
     """
-    Programmatically generate templates for all 64 syllogistic forms × 8 conclusions.
+    Generate templates for all 64 syllogistic forms × 8 conclusions.
     Returns a list of 512 template dicts, each with the same shape as syllogism_templates.json.
     """
     moods = ["A", "E", "I", "O"]
@@ -101,11 +105,6 @@ def compute_wcs_label(form: str, question: str) -> int:
     """
     Compute the WCS label (0/1/2) for the given form and question.
     """
-    from .wcs.gold_wcs import check_9_conclusions
-    from .wcs.encoders import build_program_for_form
-    from .wcs.leastmodel import least_model
-    from .wcs.tv import TV
-
     P, domain = build_program_for_form(form)
     I = least_model(P, domain=domain)
     vals = check_9_conclusions(I, a="a", c="c")
@@ -128,7 +127,9 @@ def make_seed(n_items: int,
               rnd_seed: int = 42):
     """
     Generates a dataset of syllogism examples 
-    based on syllogism templates and different domains.
+    based on syllogism_templates.json and domains.json.
+    This is the --template-based random generation method
+    This is mainly for the few first pilot experiments, where we want a smaller dataset with some variability.
 
     Each generated example is created by combining:
       - one syllogism form (template) e.g. AA4, OA4 from configs/syllogism_templates.json
@@ -195,7 +196,8 @@ def make_seed(n_items: int,
 def make_seed_all_forms(domains_path: str, out_fp: str):
     """
     Generate an exhaustive dataset covering all 64 forms × 8 conclusions × all domain triplets.
-    No random sampling — every combination is included exactly once.
+    No random sampling — every combination is included exactly once. Full dataset with expanded forms.
+    This is for the final pipeline evaluation, where we want to test all syllogism forms without sampling variability.
     """
     templates = build_all_form_templates()
 
