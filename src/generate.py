@@ -195,7 +195,8 @@ def make_seed(n_items: int,
 
 def make_seed_all_forms(domains_path: str, out_fp: str):
     """
-    Generate an exhaustive dataset covering all 64 forms × 8 conclusions × all domain triplets.
+    Generate an exhaustive dataset covering all 64 forms × 8 conclusions from build_all_form_templates() 
+    and x with all domain triplets.
     No random sampling — every combination is included exactly once. Full dataset with expanded forms.
     This is for the final pipeline evaluation, where we want to test all syllogism forms without sampling variability.
     """
