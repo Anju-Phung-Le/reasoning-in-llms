@@ -4,6 +4,7 @@ from .wcs.gold_wcs import check_9_conclusions
 from .wcs.encoders import build_program_for_form
 from .wcs.leastmodel import least_model
 from .wcs.tv import TV
+from .classical.classical import compute_classical_label
 
 
 # Natural-language patterns for premise moods
@@ -169,12 +170,13 @@ def make_seed(n_items: int,
         premises, question = _inst(tmpl, A, B, C)     # fill in the placeholders
 
         # Build one syllogism example
+        conclusion_code = question_to_conclusion(tmpl["question"])
         item = {
             "id": f"ex{uuid.uuid4().hex[:8]}",        
             "premises": premises,                     
             "question": question,                     
             "options": tmpl["options"],               
-            "label_classical": tmpl["label_classical"],
+            "label_classical": compute_classical_label(tmpl["form"], conclusion_code),
             "label_wcs": compute_wcs_label(tmpl["form"], tmpl["question"]),           
             "role": "none",                           
             "domain": dom,                            
@@ -199,8 +201,11 @@ def make_seed_all_forms(domains_path: str, out_fp: str):
     and x with all domain triplets.
     No random sampling — every combination is included exactly once. Full dataset with expanded forms.
     This is for the final pipeline evaluation, where we want to test all syllogism forms without sampling variability.
+
+    Each output record groups all 8 conclusions under one form + domain triplet, 
+    with their respective classical and WCS labels.
     """
-    templates = build_all_form_templates()
+    moods = ["A", "E", "I", "O"]
 
     with open(domains_path) as f:
         domains = json.load(f)
@@ -211,22 +216,38 @@ def make_seed_all_forms(domains_path: str, out_fp: str):
             triples.append((dom, A, B, C))
 
     items = []
-    for tmpl in templates:
-        for dom, A, B, C in triples:
-            premises, question = _inst(tmpl, A, B, C)
+    for m1 in moods:
+        for m2 in moods:
+            for fig in range(1, 5):
+                form = f"{m1}{m2}{fig}"
+                (s1, p1), (s2, p2) = _FIGURE_SP[fig]
+                prem1 = _MOOD_PREMISE[m1].format(S=s1, P=p1)
+                prem2 = _MOOD_PREMISE[m2].format(S=s2, P=p2)
 
-            item = {
-                "id": f"ex{uuid.uuid4().hex[:8]}",
-                "premises": premises,
-                "question": question,
-                "options": tmpl["options"],
-                "conclusion": tmpl["conclusion"],
-                "label_wcs": compute_wcs_label(tmpl["form"], tmpl["question"]),
-                "role": "none",
-                "domain": dom,
-                "form": tmpl["form"],
-            }
-            items.append(item)
+                for dom, A, B, C in triples:
+                    premises = [
+                        prem1.format(A=A, B=B, C=C),
+                        prem2.format(A=A, B=B, C=C),
+                    ]
+
+                    conclusions = {}
+                    for conc_code, q_template in _CONCLUSION_Q.items():
+                        question = q_template.format(A=A, B=B, C=C)
+                        conclusions[conc_code] = {
+                            "question": question,
+                            "classical": compute_classical_label(form, conc_code),
+                            "wcs": compute_wcs_label(form, q_template),
+                        }
+
+                    item = {
+                        "id": f"ex{uuid.uuid4().hex[:8]}",
+                        "form": form,
+                        "domain": dom,
+                        "role": "none",
+                        "premises": premises,
+                        "conclusions": conclusions,
+                    }
+                    items.append(item)
 
     Path(out_fp).parent.mkdir(parents=True, exist_ok=True)
 
@@ -235,4 +256,4 @@ def make_seed_all_forms(domains_path: str, out_fp: str):
             f.write(json.dumps(x, ensure_ascii=False) + "\n")
 
     print(f"Wrote {len(items)} seeds to {out_fp} "
-          f"(64 forms × 8 conclusions × {len(triples)} domain triplets)")
+          f"(64 forms × {len(triples)} domain triplets, 8 conclusions each)")

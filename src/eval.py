@@ -5,6 +5,9 @@ def evaluate(gold_fp: str, pred_fp: str, out_csv: str):
     """
     Compare model predictions to classical and WCS labels and write role-level metrics.
 
+    Both gold and pred files use the grouped format where each record has a
+    "conclusions" dict mapping conclusion codes to their labels/predictions.
+
     Args:
         gold_fp (str): Path to the processed dataset (e.g. data/processed/dataset_v1.jsonl)
         pred_fp (str): Path to model predictions (e.g. outputs/flan_t5_predictions.jsonl)
@@ -28,12 +31,17 @@ def evaluate(gold_fp: str, pred_fp: str, out_csv: str):
             if not g:
                 continue
             role = g["role"]
-            pred_idx = p.get("pred_index", -1)
-            by_role[role]["n"] += 1
 
-            # Count if model predicts the same labels as gold labels, adds one if correct and 0 if not
-            by_role[role]["classical_ok"] += int(pred_idx == g["label_classical"])
-            by_role[role]["wcs_ok"] += int(pred_idx == g["label_wcs"])
+            for conc_code, pred_conc in p["conclusions"].items():
+                gold_conc = g["conclusions"].get(conc_code)
+                if not gold_conc:
+                    continue
+                pred_idx = pred_conc.get("pred_index", -1)
+                by_role[role]["n"] += 1
+
+                # Count if model predicts the same labels as gold labels
+                by_role[role]["classical_ok"] += int(pred_idx == gold_conc["classical"])
+                by_role[role]["wcs_ok"] += int(pred_idx == gold_conc["wcs"])
 
     # Gets the key and agg values of the dict and compute accuracy per role
     rows = []
