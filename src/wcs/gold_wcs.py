@@ -50,19 +50,6 @@ def check_9_conclusions(I, a: str = "a", c: str = "c") -> Dict[str, TV]:
     out["Ica"] = some_A_are_B(I, c, a)
     out["Oca"] = some_A_are_not_B(I, c, a)
 
-    #   A  ⊃  I   ("All" subsumes "Some")
-    #   E  ⊃  O   ("No"  subsumes "Some … not")
-    # This is subalternation in traditional logic, so if Aac is TRUE, then Iac must be FALSE 
-    # (since WCS is cautious and does not infer UNKNOWN as TRUE).
-    if out["Aac"] == TV.TRUE:
-        out["Iac"] = TV.FALSE
-    if out["Aca"] == TV.TRUE:
-        out["Ica"] = TV.FALSE
-    if out["Eac"] == TV.TRUE:
-        out["Oac"] = TV.FALSE
-    if out["Eca"] == TV.TRUE:
-        out["Oca"] = TV.FALSE
-
     # NVC: ONLY IF none of the 8 are TRUE
     out["NVC"] = TV.TRUE if all(v != TV.TRUE for k, v in out.items()) else TV.FALSE
     return out

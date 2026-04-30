@@ -1,5 +1,5 @@
 from itertools import product, combinations
-from ..wcs.encoders import figure_pairs
+from wcs.encoders import figure_pairs
 
 # All 8 possible object types: (a_val, b_val, c_val), each 0 or 1.
 # e.g. (1, 0, 1) = object that is a-member, not b-member, c-member.
@@ -90,10 +90,10 @@ def all_satisfying_models(form):
     for model in all_models():
         premise1_holds = _premise_holds(model, mood1, y1, z1)
         premise2_holds = _premise_holds(model, mood2, y2, z2)
-        a_nonempty = any(t[ai] == 1 for t in model)
-        b_nonempty = any(t[bi] == 1 for t in model)
-        c_nonempty = any(t[ci] == 1 for t in model)
-        if premise1_holds and premise2_holds and a_nonempty and b_nonempty and c_nonempty:
+        # a_nonempty = any(t[ai] == 1 for t in model)
+        # b_nonempty = any(t[bi] == 1 for t in model)
+        # c_nonempty = any(t[ci] == 1 for t in model)
+        if premise1_holds and premise2_holds:  # and a_nonempty and b_nonempty and c_nonempty:
             satisfying.append(model)
     return satisfying
 
