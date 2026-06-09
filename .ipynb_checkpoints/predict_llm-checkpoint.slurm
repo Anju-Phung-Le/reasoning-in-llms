@@ -23,14 +23,14 @@ module load nlpl-pytorch/2.1.2-foss-2022b-cuda-12.0.0-Python-3.10.8
 # WORKAROUND for protobuf / sentencepiece mismatch
 export PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python
 
-# 3) Predict: run Mistral-7B-Instruct-v0.3 on dataset
+# 3) Predict
 python3 -m src.cli predict \
-  --model mistralai/Mistral-7B-Instruct-v0.3 \
-  --data data/processed/dataset_v1.jsonl \
-  --out data/predictions/mistral_7b_instruct_predictions.jsonl
+  --model deepseek-ai/DeepSeek-R1-Distill-Llama-8B \
+  --data data/processed/dataset_all_forms.jsonl \
+  --out data/predictions/deepseek_8b_all_forms_predictions.jsonl
 
-# 4) Eval: evaluate Mistral predictions
+# 4) Eval
 python3 -m src.cli eval \
-  --gold data/processed/dataset_v1.jsonl \
-  --pred data/predictions/mistral_7b_instruct_predictions.jsonl \
-  --out outputs/mistral_7b_instruct_outputs_log.csv
+  --gold data/processed/dataset_all_forms.jsonl \
+  --pred data/predictions/deepseek_8b_all_forms_predictions.jsonl \
+  --out outputs/deepseek_8b_all_forms_outputs_log.csv

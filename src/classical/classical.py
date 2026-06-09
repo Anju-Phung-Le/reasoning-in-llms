@@ -1,5 +1,5 @@
 from itertools import product, combinations
-from wcs.encoders import figure_pairs
+from ..wcs.encoders import figure_pairs
 
 # All 8 possible object types: (a_val, b_val, c_val), each 0 or 1.
 # e.g. (1, 0, 1) = object that is a-member, not b-member, c-member.

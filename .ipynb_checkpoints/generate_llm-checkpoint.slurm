@@ -25,12 +25,32 @@ export PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python
 
 # 1) Generate: seed dataset
 python3 -m src.cli gen \
-  --n 150 \
-  --templates configs/syllogism_templates.json \
+  --all-forms \
   --domains configs/domains.json \
-  --out data/raw/seed.jsonl
+  --out data/raw/seed_all_forms.jsonl
 
 # 2) Expand: create full dataset
 python3 -m src.cli expand \
-  --in data/raw/seed.jsonl \
-  --out data/processed/dataset_v1.jsonl
+  --in data/raw/seed_all_forms.jsonl \
+  --out data/processed/dataset_all_forms.jsonl
+
+echo "Checking files..."
+wc -l data/raw/seed_all_forms.jsonl
+wc -l data/processed/dataset_all_forms.jsonl
+
+python3 - <<'PY'
+import json
+
+for fp in [
+    "data/raw/seed_all_forms.jsonl",
+    "data/processed/dataset_all_forms.jsonl",
+]:
+    lines = 0
+    conclusions = 0
+    with open(fp) as f:
+        for line in f:
+            item = json.loads(line)
+            lines += 1
+            conclusions += len(item["conclusions"])
+    print(f"{fp}: {lines} JSONL lines, {conclusions} conclusion-level items")
+PY

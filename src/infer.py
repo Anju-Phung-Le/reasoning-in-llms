@@ -81,7 +81,7 @@ def predict(model_name: str, data_fp: str, out_fp: str, max_new_tokens: int = 2)
 
                 # else: use next-token logits (chat-templates)
                 else:
-                    if hasattr(tok, "apply_chat_template"):
+                    if getattr(tok, "chat_template", None):
                         prompt = tok.apply_chat_template(
                             [{"role": "user", "content": prompt}],
                             tokenize=False,
