@@ -198,3 +198,7 @@ def save_classical_gold_table(out_path: str = "data/processed/classical_gold_tab
         json.dump(results, f, indent=2, ensure_ascii=False)
 
     print(f"\nSaved classical gold table to {out_path}")
+
+
+if __name__ == "__main__":
+    save_classical_gold_table()

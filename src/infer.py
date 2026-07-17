@@ -73,7 +73,7 @@ def predict(model_name: str, data_fp: str, out_fp: str, max_new_tokens: int = 2)
                         do_sample=False,
                         pad_token_id=tok.eos_token_id,
                     )
-                    text = tok.decode(out[0], skip_special_tokens=True).strip()
+                    text = tok.decode(out[0], skip_special_tokens=True).strip() # save the conversation 
 
                     letter = text[:1].upper() if text else ""
                     idx = LETTERS.find(letter) if letter else -1
