@@ -18,6 +18,14 @@ def main():
     p_pred.add_argument("--model", required=True, help="Hugging Face model name")
     p_pred.add_argument("--data", required=True, help="Input dataset JSONL file")
     p_pred.add_argument("--out", required=True, help="Output predictions JSONL file")
+    p_pred.add_argument("--log", default=None,
+                        help="Path to conversation log JSONL. "
+                             "Default: alongside --out. Pass empty string to disable.")
+    p_pred.add_argument("--cot", action="store_true",
+                        help="Enable chain-of-thought mode (free generation + <think> stripping).")
+    p_pred.add_argument("--cot-max-new-tokens", dest="cot_max_new_tokens",
+                        type=int, default=256,
+                        help="Max new tokens when --cot is enabled (default: 256).")
 
     # eval command - eval.py evaluate()
     p_eval = subparsers.add_parser("eval", help="Evaluate predictions.")
@@ -46,7 +54,10 @@ def main():
     elif args.cmd == "expand":
         expand_roles(args.inp, args.out)
     elif args.cmd == "predict":
-        predict(args.model, args.data, args.out)
+        predict(args.model, args.data, args.out,
+                log_fp=args.log,
+                cot=args.cot,
+                cot_max_new_tokens=args.cot_max_new_tokens)
     elif args.cmd == "eval":
         evaluate(args.gold, args.pred, args.out)
 
