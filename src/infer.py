@@ -98,10 +98,13 @@ def predict(model_name: str, data_fp: str, out_fp: str, max_new_tokens: int = 2,
         log_fp = str(out_path.with_name(out_path.stem + "_conversations.jsonl"))
     if log_fp:
         Path(log_fp).parent.mkdir(parents=True, exist_ok=True)
-    flog = open(log_fp, "w") if log_fp else None
+    # buffering=1 => line-buffered, flush on every '\n'. Critical for cluster jobs
+    # where we want to see progress and inspect predictions while running.
+    flog = open(log_fp, "w", buffering=1) if log_fp else None
 
-    with open(data_fp) as fin, open(out_fp, "w") as fout, torch.inference_mode():
-        for line in fin:
+    with open(data_fp) as fin, open(out_fp, "w", buffering=1) as fout, torch.inference_mode():
+        n_preds = 0
+        for item_idx, line in enumerate(fin):
             item = json.loads(line)
 
             for conc_code, conc in item["conclusions"].items():
@@ -206,6 +209,11 @@ def predict(model_name: str, data_fp: str, out_fp: str, max_new_tokens: int = 2,
                         log_record["scratchpad"] = scratchpad
                         log_record["cleaned_output"] = cleaned
                     flog.write(json.dumps(log_record, ensure_ascii=False) + "\n")
+
+                n_preds += 1
+                # Progress print every 20 predictions so SLURM stdout shows life.
+                if n_preds % 20 == 0:
+                    print(f"[progress] {n_preds} predictions written", flush=True)
 
             fout.write(json.dumps(item, ensure_ascii=False) + "\n")
 
