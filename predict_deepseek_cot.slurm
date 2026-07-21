@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --job-name=deepseek-cot
 #SBATCH --account=ec403
-#SBATCH --time=12:00:00
+#SBATCH --time=06:00:00
 #SBATCH --partition=accel
 #SBATCH --gpus=1
 #SBATCH --nodes=1
@@ -27,15 +27,16 @@ module load nlpl-pytorch/2.1.2-foss-2022b-cuda-12.0.0-Python-3.10.8
 # WORKAROUND for protobuf / sentencepiece mismatch
 export PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python
 
-# DeepSeek CoT (reasoning model — larger token budget for <think> traces)
+# DeepSeek CoT on SUBSAMPLED dataset (256 items × 8 = 2048 predictions).
+# Reasoning model still needs 384 tokens for <think>...</think> + answer.
 python3 -m src.cli predict \
   --model deepseek-ai/DeepSeek-R1-Distill-Llama-8B \
-  --data data/processed/dataset_all_forms.jsonl \
-  --out data/predictions/deepseek_8b_cot_all_forms_predictions.jsonl \
-  --cot --cot-max-new-tokens 512
+  --data data/processed/dataset_sub256.jsonl \
+  --out data/predictions/deepseek_8b_cot_sub256_predictions.jsonl \
+  --cot --cot-max-new-tokens 384
 
 # Eval runs on CPU quickly; safe to include here.
 python3 -m src.cli eval \
-  --gold data/processed/dataset_all_forms.jsonl \
-  --pred data/predictions/deepseek_8b_cot_all_forms_predictions.jsonl \
-  --out outputs/deepseek_8b_cot_all_forms_outputs_log.csv
+  --gold data/processed/dataset_sub256.jsonl \
+  --pred data/predictions/deepseek_8b_cot_sub256_predictions.jsonl \
+  --out outputs/deepseek_8b_cot_sub256_outputs_log.csv
