@@ -1,0 +1,7 @@
+/var/spool/slurmd/job4003359/slurm_script: line 14: /fp/homes01/u01/ec-anjul/.bashrc: No such file or directory
+Loading checkpoint shards:   0%|                                                              | 0/2 [00:00<?, ?it/s]Loading checkpoint shards:  50%|███████████████████████████                           | 1/2 [00:17<00:17, 17.18s/it]Loading checkpoint shards: 100%|██████████████████████████████████████████████████████| 2/2 [00:31<00:00, 15.73s/it]Loading checkpoint shards: 100%|██████████████████████████████████████████████████████| 2/2 [00:31<00:00, 15.94s/it]
+/fp/projects01/ec30/software/easybuild/software/nlpl-transformers/4.47.1-foss-2022b-Python-3.10.8/lib/python3.10/site-packages/transformers/generation/configuration_utils.py:628: UserWarning: `do_sample` is set to `False`. However, `temperature` is set to `0.6` -- this flag is only used in sample-based generation modes. You should set `do_sample=True` or unset `temperature`.
+  warnings.warn(
+/fp/projects01/ec30/software/easybuild/software/nlpl-transformers/4.47.1-foss-2022b-Python-3.10.8/lib/python3.10/site-packages/transformers/generation/configuration_utils.py:633: UserWarning: `do_sample` is set to `False`. However, `top_p` is set to `0.95` -- this flag is only used in sample-based generation modes. You should set `do_sample=True` or unset `top_p`.
+  warnings.warn(
+[2026-07-22T07:18:34.011] error: *** JOB 4003359 ON gpu-13 CANCELLED AT 2026-07-22T07:18:34 DUE TO TIME LIMIT ***

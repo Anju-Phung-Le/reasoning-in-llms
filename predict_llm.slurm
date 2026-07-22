@@ -23,14 +23,16 @@ module load nlpl-pytorch/2.1.2-foss-2022b-cuda-12.0.0-Python-3.10.8
 # WORKAROUND for protobuf / sentencepiece mismatch
 export PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python
 
-# 3) Predict
+# DeepSeek CoT (reasoning model - needs more tokens)
 python3 -m src.cli predict \
   --model deepseek-ai/DeepSeek-R1-Distill-Llama-8B \
   --data data/processed/dataset_all_forms.jsonl \
-  --out data/predictions/deepseek_8b_all_forms_predictions.jsonl
+  --out data/predictions/deepseek_8b_all_forms_predictions_cot.jsonl \
+  --cot --cot-max-new-tokens 512
 
-# 4) Eval
-python3 -m src.cli eval \
-  --gold data/processed/dataset_all_forms.jsonl \
-  --pred data/predictions/deepseek_8b_all_forms_predictions.jsonl \
-  --out outputs/deepseek_8b_all_forms_outputs_log.csv
+# Mistral CoT (instruct model - 256 is enough)
+python3 -m src.cli predict \
+  --model mistralai/Mistral-7B-Instruct-v0.3 \
+  --data data/processed/dataset_all_forms.jsonl \
+  --out data/predictions/mistral_7b_all_forms_predictions_cot.jsonl \
+  --cot --cot-max-new-tokens 256

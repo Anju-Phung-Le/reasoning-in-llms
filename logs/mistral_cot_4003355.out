@@ -1,0 +1,24 @@
+
+Job 4003355 consumed 5.6 billing hours from project ec403.
+
+Submitted 2026-07-22T01:00:17; waited 1.0 seconds in the queue after becoming eligible to run.
+
+Requested wallclock time: 2.0 hours
+Elapsed wallclock time:   17.7 minutes
+
+Job was cancelled.
+
+Task and CPU statistics:
+ID             CPUs  Tasks  CPU util                Start   Elapsed  Exit status
+4003355           4            0.0 %  2026-07-22T01:00:18  1063.0 s  0
+4003355.batch     4      1    24.5 %  2026-07-22T01:00:18  1064.0 s  Signal 15
+
+Used CPU time:   17.4 CPU minutes
+Unused CPU time: 53.5 CPU minutes
+
+Memory statistics, in GiB:
+ID              Alloc   Usage
+4003355          40.0        
+4003355.batch    40.0    14.6
+
+Job 4003355 completed at Wed Jul 22 01:18:04 CEST 2026
