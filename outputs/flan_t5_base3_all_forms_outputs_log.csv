@@ -1,5 +1,5 @@
-role,n,acc_classical,acc_wcs,delta_wcs_minus_classical
-adult,8192,0.107,0.118,0.011
-child,8192,0.109,0.12,0.011
-none,8192,0.1,0.116,0.016
-teen,8192,0.108,0.119,0.011
+role,n,c_usage,acc_classical,macro_f1_classical,f1_A_classical,f1_B_classical,f1_C_classical,recall_C_classical,precision_C_classical,acc_wcs,macro_f1_wcs,f1_A_wcs,f1_B_wcs,f1_C_wcs,recall_C_wcs,precision_C_wcs,delta_acc_wcs_minus_classical,delta_macro_f1_wcs_minus_classical
+adult,8192,0.002,0.107,0.127,0.19,0.188,0.004,0.002,0.889,0.118,0.138,0.194,0.218,0.003,0.002,0.611,0.011,0.011
+child,8192,0.002,0.109,0.129,0.187,0.197,0.004,0.002,0.875,0.12,0.14,0.19,0.229,0.003,0.001,0.562,0.011,0.011
+none,8192,0.003,0.1,0.118,0.171,0.176,0.006,0.003,0.852,0.116,0.136,0.201,0.202,0.005,0.003,0.704,0.016,0.018
+teen,8192,0.001,0.108,0.128,0.19,0.192,0.003,0.001,1.0,0.119,0.138,0.191,0.222,0.002,0.001,0.7,0.011,0.01
