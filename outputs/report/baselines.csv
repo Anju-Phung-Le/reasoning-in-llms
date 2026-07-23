@@ -1,0 +1,4 @@
+baseline,dataset,classical_pct,wcs_pct,n
+random_uniform,-,33.3,33.3,
+always_C,dataset_sub256.jsonl,87.21,85.79,2048
+always_C,dataset_all_forms.jsonl,88.28,86.72,32768

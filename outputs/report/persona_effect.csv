@@ -1,0 +1,9 @@
+model,regime,child_acc_pct,none_acc_pct,delta_pp,child_c_usage_pct,none_c_usage_pct
+deepseek_8b,forced-choice,5.9,5.9,0.0,0.0,0.0
+deepseek_8b,CoT-1024 sub64,41.2,36.4,4.8,20.6,31.8
+deepseek_8b,CoT-384 sub256,11.1,10.4,0.7,2.3,3.9
+flan_t5_base3,forced-choice,10.9,10.0,0.9,0.2,0.3
+flan_t5_large3,forced-choice,14.3,15.3,-1.0,4.6,5.7
+flan_t5_small4,forced-choice,5.9,5.9,0.0,0.0,0.0
+mistral_7b,forced-choice,31.8,21.4,10.4,24.4,13.0
+mistral_7b,CoT-384 sub256,36.5,22.1,14.4,26.8,13.7

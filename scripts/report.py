@@ -72,7 +72,12 @@ def _classify(fname: str) -> tuple[str, str]:
     """Return (model, regime) tuple from CSV filename."""
     m = re.match(r"(deepseek_8b|mistral_7b|flan_t5_[a-z0-9]+)_", fname)
     model = m.group(1) if m else fname
-    regime = "CoT sub256" if "_cot_sub256_" in fname else "forced-choice"
+    if "_cot1024_sub64_" in fname:
+        regime = "CoT-1024 sub64"
+    elif "_cot_sub256_" in fname:
+        regime = "CoT-384 sub256"
+    else:
+        regime = "forced-choice"
     return model, regime
 
 
@@ -92,7 +97,7 @@ def eval_summary(write_csv: bool = False) -> None:
         header = f"    {'regime':<14}  {'role':<6}  {'n':>5}  {'c_use%':>7}  {'acc_c%':>7}  {'acc_w%':>7}  {'Δwcs':>6}"
         print(header)
         print("    " + "-" * (len(header) - 4))
-        for regime in ("forced-choice", "CoT sub256"):
+        for regime in ("forced-choice", "CoT-384 sub256", "CoT-1024 sub64"):
             if regime not in regimes:
                 continue
             for row in regimes[regime]:

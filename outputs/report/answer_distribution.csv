@@ -1,0 +1,4 @@
+file,n,A_pct,B_pct,C_pct,unparsed_pct
+deepseek_8b_cot1024_sub64_predictions,512,51.37,24.41,24.22,0.0
+deepseek_8b_cot_sub256_predictions,2005,91.42,5.89,2.49,0.2
+mistral_7b_cot_sub256_predictions,2048,49.07,31.79,19.09,0.05
