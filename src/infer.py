@@ -27,9 +27,25 @@ def _split_think(text: str):
     concatenation of any <think>...</think> content and cleaned is everything
     else (with stray think tags removed). For non-reasoning models both are
     just ("", text).
+
+    Note: some reasoning-model chat templates (e.g. DeepSeek-R1) inject the
+    opening <think> tag as part of the prompt, so the generated text only
+    contains the closing </think>. In that case we treat everything before
+    the first </think> as scratchpad and everything after as the cleaned
+    answer, so letter extraction runs on the model's post-reasoning answer
+    rather than on the reasoning trace (which is full of articles like "a").
     """
     scratchpad_parts = re.findall(r"<think>(.*?)</think>", text, flags=re.DOTALL | re.IGNORECASE)
     cleaned = _THINK_BLOCK_RE.sub("", text)
+
+    # Handle dangling </think> with no matching opening <think>
+    # (DeepSeek case: opening tag was baked into the prompt).
+    if not scratchpad_parts:
+        m = re.search(r"</think>", cleaned, flags=re.IGNORECASE)
+        if m:
+            scratchpad_parts = [cleaned[: m.start()]]
+            cleaned = cleaned[m.end():]
+
     cleaned = _THINK_TAG_RE.sub("", cleaned).strip()
     scratchpad = "\n".join(p.strip() for p in scratchpad_parts).strip()
     return scratchpad, cleaned
@@ -117,6 +133,7 @@ def predict(model_name: str, data_fp: str, out_fp: str, max_new_tokens: int = 2,
                     )
 
                 scratchpad = ""
+                n_gen_tokens = None  # only tracked in decoder-only CoT branch
 
                 # ── Encoder-decoder branch (Flan-T5) ────────────────────────
                 if getattr(config, "is_encoder_decoder", False):
@@ -164,6 +181,7 @@ def predict(model_name: str, data_fp: str, out_fp: str, max_new_tokens: int = 2,
                         )
                         # Only decode the newly generated tokens, not the prompt.
                         gen_ids = out[0, enc["input_ids"].shape[1]:]
+                        n_gen_tokens = int(gen_ids.shape[0])
                         text = tok.decode(gen_ids, skip_special_tokens=True).strip()
 
                         scratchpad, cleaned = _split_think(text)
@@ -208,6 +226,18 @@ def predict(model_name: str, data_fp: str, out_fp: str, max_new_tokens: int = 2,
                     if cot:
                         log_record["scratchpad"] = scratchpad
                         log_record["cleaned_output"] = cleaned
+                        # Budget-usage diagnostics: how many new tokens were
+                        # generated, whether we hit the ceiling, and whether
+                        # the reasoning block was actually closed. gen_tokens
+                        # is only tracked in the decoder-only branch; for
+                        # encoder-decoder we log None.
+                        log_record["gen_tokens"] = n_gen_tokens
+                        log_record["budget"] = cot_max_new_tokens
+                        log_record["hit_budget"] = (
+                            n_gen_tokens >= cot_max_new_tokens
+                            if n_gen_tokens is not None else None
+                        )
+                        log_record["has_closing_think"] = "</think>" in text.lower()
                     flog.write(json.dumps(log_record, ensure_ascii=False) + "\n")
 
                 n_preds += 1
