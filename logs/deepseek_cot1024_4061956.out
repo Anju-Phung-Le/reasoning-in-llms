@@ -1,0 +1,26 @@
+Starting job 4061956 on gpu-11 on Fox at Tue Aug 18 13:55:46 CEST 2026
+
+
+Job 4061956 consumed 0.2 billing hours from project ec403.
+
+Submitted 2026-08-18T13:55:45; waited 0.0 seconds in the queue after becoming eligible to run.
+
+Requested wallclock time: 5.0 hours
+Elapsed wallclock time:   41.0 seconds
+
+Job was cancelled.
+
+Task and CPU statistics:
+ID             CPUs  Tasks  CPU util                Start  Elapsed  Exit status
+4061956           4            0.0 %  2026-08-18T13:55:45   41.0 s  0
+4061956.batch     4      1     6.1 %  2026-08-18T13:55:45   42.0 s  Signal 15
+
+Used CPU time:   10.3 CPU seconds
+Unused CPU time: 2.6 CPU minutes
+
+Memory statistics, in GiB:
+ID              Alloc   Usage
+4061956          40.0        
+4061956.batch    40.0     0.5
+
+Job 4061956 completed at Tue Aug 18 13:56:29 CEST 2026

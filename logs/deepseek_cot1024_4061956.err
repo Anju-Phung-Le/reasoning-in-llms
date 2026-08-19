@@ -1,0 +1,2 @@
+/var/spool/slurmd/job4061956/slurm_script: line 14: /fp/homes01/u01/ec-anjul/.bashrc: No such file or directory
+Loading checkpoint shards:   0%|                                                        | 0/2 [00:00<?, ?it/s][2026-08-18T13:56:26.889] error: *** JOB 4061956 ON gpu-11 CANCELLED AT 2026-08-18T13:56:26 DUE to SIGNAL Terminated ***
