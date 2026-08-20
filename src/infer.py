@@ -151,6 +151,7 @@ def predict(model_name: str, data_fp: str, out_fp: str, max_new_tokens: int = 2,
 
                 scratchpad = ""
                 n_gen_tokens = None  # only tracked in decoder-only CoT branch
+                budget_forced = False  # only set in decoder-only CoT branch
 
                 # ── Encoder-decoder branch (Flan-T5) ────────────────────────
                 if getattr(config, "is_encoder_decoder", False):
@@ -213,6 +214,44 @@ def predict(model_name: str, data_fp: str, out_fp: str, max_new_tokens: int = 2,
                         scratchpad, cleaned = _split_think(text)
                         letter = _extract_letter(cleaned)
                         pred_index = "ABC".find(letter) if letter else -1
+
+                        # Budget forcing: if the reasoning block never closed
+                        # (model exhausted `cot_max_new_tokens`), the extracted
+                        # letter is coming from mid-reasoning text and is
+                        # unreliable. Force-close </think>, append a "Final
+                        # answer:" cue, and generate a few more tokens greedily
+                        # to get a clean letter.
+                        budget_forced = False
+                        if "</think>" not in text.lower():
+                            force_suffix = "\n</think>\n\nFinal answer: "
+                            suffix_ids = tok(
+                                force_suffix,
+                                return_tensors="pt",
+                                add_special_tokens=False,
+                            )["input_ids"].to(input_device)
+                            forced_input = torch.cat([out, suffix_ids], dim=1)
+                            force_out = mdl.generate(
+                                input_ids=forced_input,
+                                max_new_tokens=8,
+                                min_new_tokens=1,
+                                do_sample=False,
+                                pad_token_id=tok.eos_token_id,
+                            )
+                            force_gen_ids = force_out[0, forced_input.shape[1]:]
+                            force_text = tok.decode(
+                                force_gen_ids, skip_special_tokens=True
+                            ).strip()
+                            forced_letter = _extract_letter(force_text)
+                            if forced_letter:
+                                letter = forced_letter
+                                pred_index = "ABC".find(letter)
+                            # Record the forced continuation for auditability.
+                            cleaned = (
+                                (cleaned + " || FORCED: " + force_text).strip()
+                                if cleaned
+                                else force_text
+                            )
+                            budget_forced = True
                     else:
                         # Argmax over {A,B,C} next-token logits (fast, forced-choice).
                         logits = mdl(**enc).logits[0, -1]
@@ -264,6 +303,7 @@ def predict(model_name: str, data_fp: str, out_fp: str, max_new_tokens: int = 2,
                             if n_gen_tokens is not None else None
                         )
                         log_record["has_closing_think"] = "</think>" in text.lower()
+                        log_record["budget_forced"] = budget_forced
                     flog.write(json.dumps(log_record, ensure_ascii=False) + "\n")
 
                 n_preds += 1
