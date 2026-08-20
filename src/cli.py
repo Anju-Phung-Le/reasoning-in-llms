@@ -26,6 +26,16 @@ def main():
     p_pred.add_argument("--cot-max-new-tokens", dest="cot_max_new_tokens",
                         type=int, default=256,
                         help="Max new tokens when --cot is enabled (default: 256).")
+    p_pred.add_argument("--do-sample", action="store_true", dest="do_sample",
+                        help="Use nucleus sampling instead of greedy decoding for CoT generation. "
+                             "Non-CoT branches remain deterministic.")
+    p_pred.add_argument("--seed", type=int, default=0,
+                        help="Random seed for sampled decoding (default: 0). "
+                             "Ignored when --do-sample is not set.")
+    p_pred.add_argument("--temperature", type=float, default=0.6,
+                        help="Sampling temperature (default: 0.6, DeepSeek-R1 recommended).")
+    p_pred.add_argument("--top-p", dest="top_p", type=float, default=0.95,
+                        help="Nucleus sampling top-p (default: 0.95).")
 
     # eval command - eval.py evaluate()
     p_eval = subparsers.add_parser("eval", help="Evaluate predictions.")
@@ -57,7 +67,11 @@ def main():
         predict(args.model, args.data, args.out,
                 log_fp=args.log,
                 cot=args.cot,
-                cot_max_new_tokens=args.cot_max_new_tokens)
+                cot_max_new_tokens=args.cot_max_new_tokens,
+                do_sample=args.do_sample,
+                seed=args.seed,
+                temperature=args.temperature,
+                top_p=args.top_p)
     elif args.cmd == "eval":
         evaluate(args.gold, args.pred, args.out)
 

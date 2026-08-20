@@ -27,16 +27,30 @@ module load nlpl-pytorch/2.1.2-foss-2022b-cuda-12.0.0-Python-3.10.8
 # WORKAROUND for protobuf / sentencepiece mismatch
 export PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python
 
+# Optional first arg: seed. See predict_deepseek_cot1024.slurm for usage.
+SEED="${1:-}"
+if [ -n "$SEED" ]; then
+  SAMPLE_FLAGS="--do-sample --seed $SEED"
+  TAG="_seed${SEED}"
+else
+  SAMPLE_FLAGS=""
+  TAG=""
+fi
+
+PRED_FP="data/predictions/deepseek_8b_cot_sub256${TAG}_predictions.jsonl"
+EVAL_FP="outputs/deepseek_8b_cot_sub256${TAG}_outputs_log.csv"
+
 # DeepSeek CoT on SUBSAMPLED dataset (256 items × 8 = 2048 predictions).
 # Reasoning model still needs 384 tokens for <think>...</think> + answer.
 python3 -m src.cli predict \
   --model deepseek-ai/DeepSeek-R1-Distill-Llama-8B \
   --data data/processed/dataset_sub256.jsonl \
-  --out data/predictions/deepseek_8b_cot_sub256_predictions.jsonl \
-  --cot --cot-max-new-tokens 384
+  --out "$PRED_FP" \
+  --cot --cot-max-new-tokens 384 \
+  $SAMPLE_FLAGS
 
 # Eval runs on CPU quickly; safe to include here.
 python3 -m src.cli eval \
   --gold data/processed/dataset_sub256.jsonl \
-  --pred data/predictions/deepseek_8b_cot_sub256_predictions.jsonl \
-  --out outputs/deepseek_8b_cot_sub256_outputs_log.csv
+  --pred "$PRED_FP" \
+  --out "$EVAL_FP"

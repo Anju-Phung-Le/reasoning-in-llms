@@ -63,7 +63,9 @@ def _extract_letter(cleaned: str) -> str:
 
 def predict(model_name: str, data_fp: str, out_fp: str, max_new_tokens: int = 2,
             log_fp: str | None = None, cot: bool = False,
-            cot_max_new_tokens: int = 256):
+            cot_max_new_tokens: int = 256,
+            do_sample: bool = False, seed: int = 0,
+            temperature: float = 0.6, top_p: float = 0.95):
     """
     Generate multiple-choice predictions (A/B/C) for a dataset and write them to JSONL.
 
@@ -83,12 +85,27 @@ def predict(model_name: str, data_fp: str, out_fp: str, max_new_tokens: int = 2,
         * Decoder-only: one forward pass, argmax next-token logit over {A,B,C}.
 
     - `cot=True` (chain-of-thought):
-        * Both branches: greedy generation with `cot_max_new_tokens` tokens.
+        * Both branches: generation with `cot_max_new_tokens` tokens (greedy by
+          default, or sampled if `do_sample=True`).
         * Prompt gets a "think step by step" suffix.
         * Reasoning-model `<think>...</think>` blocks are stripped before letter
           extraction and stored separately in the log as `scratchpad`.
         * Letter extracted as the LAST standalone A/B/C in the cleaned output.
+
+    Sampling
+    --------
+    When `do_sample=True`, the CoT generation paths use nucleus sampling
+    (`temperature`, `top_p`) instead of greedy decoding. Use `seed` to make each
+    sampled run reproducible; run multiple seeds (0, 1, 2, ...) to build a
+    distribution of predictions for variance analysis. Sampling has no effect
+    on the non-CoT branches (forced-choice argmax over A/B/C logits and Flan-T5
+    2-token greedy), which remain deterministic.
     """
+    # Seed everything so sampled runs are reproducible per (model, seed).
+    torch.manual_seed(seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed_all(seed)
+
     config = AutoConfig.from_pretrained(model_name)
     tok = AutoTokenizer.from_pretrained(model_name)
 
@@ -139,13 +156,19 @@ def predict(model_name: str, data_fp: str, out_fp: str, max_new_tokens: int = 2,
                 if getattr(config, "is_encoder_decoder", False):
                     enc = tok(prompt, return_tensors="pt").to(device)
 
-                    out = mdl.generate(
-                        **enc,
+                    # Sampling only affects CoT; forced-choice keeps greedy (2 tokens).
+                    use_sample = cot and do_sample
+                    gen_kwargs = dict(
                         max_new_tokens=cot_max_new_tokens if cot else max_new_tokens,
                         min_new_tokens=1,
-                        do_sample=False,
+                        do_sample=use_sample,
                         pad_token_id=tok.eos_token_id,
                     )
+                    if use_sample:
+                        gen_kwargs["temperature"] = temperature
+                        gen_kwargs["top_p"] = top_p
+
+                    out = mdl.generate(**enc, **gen_kwargs)
                     text = tok.decode(out[0], skip_special_tokens=True).strip()
 
                     if cot:
@@ -172,13 +195,16 @@ def predict(model_name: str, data_fp: str, out_fp: str, max_new_tokens: int = 2,
 
                     if cot:
                         # Free generation, then extract answer from cleaned text.
-                        out = mdl.generate(
-                            **enc,
+                        gen_kwargs = dict(
                             max_new_tokens=cot_max_new_tokens,
                             min_new_tokens=1,
-                            do_sample=False,
+                            do_sample=do_sample,
                             pad_token_id=tok.eos_token_id,
                         )
+                        if do_sample:
+                            gen_kwargs["temperature"] = temperature
+                            gen_kwargs["top_p"] = top_p
+                        out = mdl.generate(**enc, **gen_kwargs)
                         # Only decode the newly generated tokens, not the prompt.
                         gen_ids = out[0, enc["input_ids"].shape[1]:]
                         n_gen_tokens = int(gen_ids.shape[0])

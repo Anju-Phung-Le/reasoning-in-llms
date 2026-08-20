@@ -27,16 +27,30 @@ module load nlpl-pytorch/2.1.2-foss-2022b-cuda-12.0.0-Python-3.10.8
 # WORKAROUND for protobuf / sentencepiece mismatch
 export PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python
 
+# Optional first arg: seed. See predict_deepseek_cot1024.slurm for usage.
+SEED="${1:-}"
+if [ -n "$SEED" ]; then
+  SAMPLE_FLAGS="--do-sample --seed $SEED"
+  TAG="_seed${SEED}"
+else
+  SAMPLE_FLAGS=""
+  TAG=""
+fi
+
+PRED_FP="data/predictions/mistral_7b_cot_sub256${TAG}_predictions.jsonl"
+EVAL_FP="outputs/mistral_7b_cot_sub256${TAG}_outputs_log.csv"
+
 # Mistral CoT on SUBSAMPLED dataset (256 items × 8 = 2048 predictions).
 # Instruct model — 128 tokens is plenty for short reasoning + letter.
 python3 -m src.cli predict \
   --model mistralai/Mistral-7B-Instruct-v0.3 \
   --data data/processed/dataset_sub256.jsonl \
-  --out data/predictions/mistral_7b_cot_sub256_predictions.jsonl \
-  --cot --cot-max-new-tokens 128
+  --out "$PRED_FP" \
+  --cot --cot-max-new-tokens 128 \
+  $SAMPLE_FLAGS
 
 # Eval runs on CPU quickly; safe to include here.
 python3 -m src.cli eval \
   --gold data/processed/dataset_sub256.jsonl \
-  --pred data/predictions/mistral_7b_cot_sub256_predictions.jsonl \
-  --out outputs/mistral_7b_cot_sub256_outputs_log.csv
+  --pred "$PRED_FP" \
+  --out "$EVAL_FP"
