@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --job-name=deepseek-cot1024
 #SBATCH --account=ec403
-#SBATCH --time=05:00:00
+#SBATCH --time=10:00:00
 #SBATCH --partition=accel
 #SBATCH --gpus=1
 #SBATCH --nodes=1
