@@ -7,7 +7,7 @@
 #SBATCH --nodes=1
 #SBATCH --cpus-per-task=4
 #SBATCH --mem=40G
-#SBATCH --exclude=gpu-14,gpu-15,gpu-16
+#SBATCH --exclude=gpu-14,gpu-15,gpu-16,gpu-17
 #SBATCH --output=logs/deepseek_cot1024_%j.out
 #SBATCH --error=logs/deepseek_cot1024_%j.err
 
