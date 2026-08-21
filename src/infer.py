@@ -57,12 +57,12 @@ def _extract_letter(cleaned: str) -> str:
     Strategy: pick the LAST standalone A/B/C — this is robust to intros like
     'Let me consider A vs B... The final answer is C.'
     """
-    matches = _ANSWER_RE.findall(cleaned.upper())
+    matches = _ANSWER_RE.findall(cleaned)
     return matches[-1] if matches else ""
 
 
 def predict(model_name: str, data_fp: str, out_fp: str, max_new_tokens: int = 2,
-            log_fp: str | None = None, cot: bool = False,
+            log_fp: str | None = None, cot: bool = False, thinking: bool = False,
             cot_max_new_tokens: int = 256,
             do_sample: bool = False, seed: int = 0,
             temperature: float = 0.6, top_p: float = 0.95):
@@ -211,10 +211,6 @@ def predict(model_name: str, data_fp: str, out_fp: str, max_new_tokens: int = 2,
                         n_gen_tokens = int(gen_ids.shape[0])
                         text = tok.decode(gen_ids, skip_special_tokens=True).strip()
 
-                        scratchpad, cleaned = _split_think(text)
-                        letter = _extract_letter(cleaned)
-                        pred_index = "ABC".find(letter) if letter else -1
-
                         # Budget forcing: if the reasoning block never closed
                         # (model exhausted `cot_max_new_tokens`), the extracted
                         # letter is coming from mid-reasoning text and is
@@ -222,8 +218,8 @@ def predict(model_name: str, data_fp: str, out_fp: str, max_new_tokens: int = 2,
                         # answer:" cue, and generate a few more tokens greedily
                         # to get a clean letter.
                         budget_forced = False
-                        if "</think>" not in text.lower():
-                            force_suffix = "\n</think>\n\nFinal answer: "
+                        if "</think>" not in text.lower() and thinking == True:
+                            force_suffix = "\n</think>\n\nFinal answer:"
                             suffix_ids = tok(
                                 force_suffix,
                                 return_tensors="pt",
@@ -232,26 +228,30 @@ def predict(model_name: str, data_fp: str, out_fp: str, max_new_tokens: int = 2,
                             forced_input = torch.cat([out, suffix_ids], dim=1)
                             force_out = mdl.generate(
                                 input_ids=forced_input,
-                                max_new_tokens=8,
+                                max_new_tokens=32,
                                 min_new_tokens=1,
                                 do_sample=False,
                                 pad_token_id=tok.eos_token_id,
                             )
                             force_gen_ids = force_out[0, forced_input.shape[1]:]
-                            force_text = tok.decode(
+                            text = tok.decode(
                                 force_gen_ids, skip_special_tokens=True
                             ).strip()
-                            forced_letter = _extract_letter(force_text)
-                            if forced_letter:
-                                letter = forced_letter
-                                pred_index = "ABC".find(letter)
+                            # forced_letter = _extract_letter(text)
+                            #pred_index = "ABC".find(forced_letter) if forced_letter else -1
                             # Record the forced continuation for auditability.
                             cleaned = (
-                                (cleaned + " || FORCED: " + force_text).strip()
+                                (cleaned + " || FORCED: " + text).strip()
                                 if cleaned
-                                else force_text
+                                else text
                             )
-                            budget_forced = True
+                            budget_forced = True    
+
+                        scratchpad, cleaned = _split_think(text)
+                        letter = _extract_letter(cleaned)
+                        pred_index = "ABC".find(letter) if letter else -1
+
+                        
                     else:
                         # Argmax over {A,B,C} next-token logits (fast, forced-choice).
                         logits = mdl(**enc).logits[0, -1]

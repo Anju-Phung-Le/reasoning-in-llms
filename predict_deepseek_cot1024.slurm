@@ -50,7 +50,7 @@ python3 -m src.cli predict \
   --model deepseek-ai/DeepSeek-R1-Distill-Llama-8B \
   --data data/processed/dataset_sub64.jsonl \
   --out "$PRED_FP" \
-  --cot --cot-max-new-tokens 2048 \
+  --cot --cot-max-new-tokens 2048 --thinking \
   $SAMPLE_FLAGS
 
 # Eval runs on CPU quickly; safe to include here.
