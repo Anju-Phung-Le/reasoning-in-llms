@@ -36,6 +36,7 @@ def main():
                         help="Sampling temperature (default: 0.6, DeepSeek-R1 recommended).")
     p_pred.add_argument("--top-p", dest="top_p", type=float, default=0.95,
                         help="Nucleus sampling top-p (default: 0.95).")
+    p_pred.add_argument("--thinking", action="store_true", help="Enable thinking mode.")
 
     # eval command - eval.py evaluate()
     p_eval = subparsers.add_parser("eval", help="Evaluate predictions.")
@@ -71,7 +72,8 @@ def main():
                 do_sample=args.do_sample,
                 seed=args.seed,
                 temperature=args.temperature,
-                top_p=args.top_p)
+                top_p=args.top_p,
+                thinking=args.thinking)
     elif args.cmd == "eval":
         evaluate(args.gold, args.pred, args.out)
 
