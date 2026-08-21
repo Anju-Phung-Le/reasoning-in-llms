@@ -38,11 +38,11 @@ OUTPUT_DIR = Path("outputs/report")
 
 MODELS = {
     "DeepSeek-8B": {
-        "pattern": "deepseek_8b_cot1024_sub64_seed{seed}_predictions.jsonl",
+        "pattern": "deepseek_8b_cot1024_sub64_v2_seed{seed}_predictions.jsonl",
         "seeds": [0, 1, 2, 3, 4],
     },
     "Mistral-7B": {
-        "pattern": "mistral_7b_cot_sub256_seed{seed}_predictions.jsonl",
+        "pattern": "mistral_7b_cot_sub256_v2_seed{seed}_predictions.jsonl",
         "seeds": [0, 1, 3, 4],
     },
 }

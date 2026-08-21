@@ -35,10 +35,10 @@ export PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python
 SEED="${1:-}"
 if [ -n "$SEED" ]; then
   SAMPLE_FLAGS="--do-sample --seed $SEED"
-  TAG="_seed${SEED}"
+  TAG="_v2_seed${SEED}"
 else
   SAMPLE_FLAGS=""
-  TAG=""
+  TAG="_v2"
 fi
 
 PRED_FP="data/predictions/deepseek_8b_cot1024_sub64${TAG}_predictions.jsonl"
