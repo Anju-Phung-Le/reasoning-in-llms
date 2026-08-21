@@ -1,0 +1,26 @@
+Starting job 4067391 on gpu-17 on Fox at Thu Aug 20 16:58:09 CEST 2026
+
+
+Job 4067391 consumed 0.1 billing hours from project ec403.
+
+Submitted 2026-08-20T16:55:46; waited 2.4 minutes in the queue after becoming eligible to run.
+
+Requested wallclock time: 10.0 hours
+Elapsed wallclock time:   25.0 seconds
+
+Job failed.
+
+Task and CPU statistics:
+ID             CPUs  Tasks  CPU util                Start  Elapsed  Exit status
+4067391           4            0.0 %  2026-08-20T16:58:09   25.0 s  1
+4067391.batch     4      1    15.6 %  2026-08-20T16:58:09   25.0 s  1
+
+Used CPU time:   15.6 CPU seconds
+Unused CPU time: 1.4 CPU minutes
+
+Memory statistics, in GiB:
+ID              Alloc   Usage
+4067391          40.0        
+4067391.batch    40.0    15.4
+
+Job 4067391 completed at Thu Aug 20 16:58:35 CEST 2026

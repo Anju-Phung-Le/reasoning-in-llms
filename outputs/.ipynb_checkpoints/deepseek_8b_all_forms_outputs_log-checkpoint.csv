@@ -1,0 +1,5 @@
+role,n,acc_classical,acc_wcs,delta_wcs_minus_classical
+adult,8192,0.058,0.061,0.004
+child,8192,0.059,0.062,0.004
+none,8192,0.059,0.062,0.004
+teen,8192,0.059,0.062,0.004

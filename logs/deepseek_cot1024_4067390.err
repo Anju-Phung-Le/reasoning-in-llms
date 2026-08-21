@@ -1,0 +1,32 @@
+/var/spool/slurmd/job4067390/slurm_script: line 14: /fp/homes01/u01/ec-anjul/.bashrc: No such file or directory
+/fp/projects01/ec30/software/easybuild/software/nlpl-pytorch/2.1.2-foss-2022b-cuda-12.0.0-Python-3.10.8/lib/python3.10/site-packages/torch/cuda/__init__.py:215: UserWarning: 
+NVIDIA H200 NVL with CUDA capability sm_90 is not compatible with the current PyTorch installation.
+The current PyTorch install supports CUDA capabilities sm_80 sm_86.
+If you want to use the NVIDIA H200 NVL GPU with PyTorch, please check the instructions at https://pytorch.org/get-started/locally/
+
+  warnings.warn(
+Loading checkpoint shards:   0%|                                                        | 0/2 [00:00<?, ?it/s]Loading checkpoint shards:  50%|████████████████████████                        | 1/2 [00:08<00:08,  8.65s/it]Loading checkpoint shards: 100%|████████████████████████████████████████████████| 2/2 [00:15<00:00,  7.55s/it]Loading checkpoint shards: 100%|████████████████████████████████████████████████| 2/2 [00:15<00:00,  7.72s/it]
+Traceback (most recent call last):
+  File "/cluster/software/EL9/easybuild/software/Python/3.10.8-GCCcore-12.2.0/lib/python3.10/runpy.py", line 196, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "/cluster/software/EL9/easybuild/software/Python/3.10.8-GCCcore-12.2.0/lib/python3.10/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "/fp/homes01/u01/ec-anjul/reasoning-in-llms/src/cli.py", line 79, in <module>
+    main()
+  File "/fp/homes01/u01/ec-anjul/reasoning-in-llms/src/cli.py", line 67, in main
+    predict(args.model, args.data, args.out,
+  File "/fp/homes01/u01/ec-anjul/reasoning-in-llms/src/infer.py", line 208, in predict
+    out = mdl.generate(**enc, **gen_kwargs)
+  File "/fp/projects01/ec30/software/easybuild/software/nlpl-pytorch/2.1.2-foss-2022b-cuda-12.0.0-Python-3.10.8/lib/python3.10/site-packages/torch/utils/_contextlib.py", line 115, in decorate_context
+    return func(*args, **kwargs)
+  File "/fp/projects01/ec30/software/easybuild/software/nlpl-transformers/4.47.1-foss-2022b-Python-3.10.8/lib/python3.10/site-packages/transformers/generation/utils.py", line 2030, in generate
+    self._prepare_special_tokens(generation_config, kwargs_has_attention_mask, device=device)
+  File "/fp/projects01/ec30/software/easybuild/software/nlpl-transformers/4.47.1-foss-2022b-Python-3.10.8/lib/python3.10/site-packages/transformers/generation/utils.py", line 1879, in _prepare_special_tokens
+    and isin_mps_friendly(elements=eos_token_tensor, test_elements=pad_token_tensor).any()
+  File "/fp/projects01/ec30/software/easybuild/software/nlpl-transformers/4.47.1-foss-2022b-Python-3.10.8/lib/python3.10/site-packages/transformers/pytorch_utils.py", line 341, in isin_mps_friendly
+    return torch.isin(elements, test_elements)
+RuntimeError: CUDA error: no kernel image is available for execution on the device
+CUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.
+For debugging consider passing CUDA_LAUNCH_BLOCKING=1.
+Compile with `TORCH_USE_CUDA_DSA` to enable device-side assertions.
+
