@@ -1,0 +1,220 @@
+Starting job 4082009 on gpu-5 on Fox at Fri Aug 21 13:51:15 CEST 2026
+
+[progress] 20 predictions written
+[progress] 40 predictions written
+[progress] 60 predictions written
+[progress] 80 predictions written
+[progress] 100 predictions written
+[progress] 120 predictions written
+[progress] 140 predictions written
+[progress] 160 predictions written
+[progress] 180 predictions written
+[progress] 200 predictions written
+[progress] 220 predictions written
+[progress] 240 predictions written
+[progress] 260 predictions written
+[progress] 280 predictions written
+[progress] 300 predictions written
+[progress] 320 predictions written
+[progress] 340 predictions written
+[progress] 360 predictions written
+[progress] 380 predictions written
+[progress] 400 predictions written
+[progress] 420 predictions written
+[progress] 440 predictions written
+[progress] 460 predictions written
+[progress] 480 predictions written
+[progress] 500 predictions written
+[progress] 520 predictions written
+[progress] 540 predictions written
+[progress] 560 predictions written
+[progress] 580 predictions written
+[progress] 600 predictions written
+[progress] 620 predictions written
+[progress] 640 predictions written
+[progress] 660 predictions written
+[progress] 680 predictions written
+[progress] 700 predictions written
+[progress] 720 predictions written
+[progress] 740 predictions written
+[progress] 760 predictions written
+[progress] 780 predictions written
+[progress] 800 predictions written
+[progress] 820 predictions written
+[progress] 840 predictions written
+[progress] 860 predictions written
+[progress] 880 predictions written
+[progress] 900 predictions written
+[progress] 920 predictions written
+[progress] 940 predictions written
+[progress] 960 predictions written
+[progress] 980 predictions written
+[progress] 1000 predictions written
+[progress] 1020 predictions written
+[progress] 1040 predictions written
+[progress] 1060 predictions written
+[progress] 1080 predictions written
+[progress] 1100 predictions written
+[progress] 1120 predictions written
+[progress] 1140 predictions written
+[progress] 1160 predictions written
+[progress] 1180 predictions written
+[progress] 1200 predictions written
+[progress] 1220 predictions written
+[progress] 1240 predictions written
+[progress] 1260 predictions written
+[progress] 1280 predictions written
+[progress] 1300 predictions written
+[progress] 1320 predictions written
+[progress] 1340 predictions written
+[progress] 1360 predictions written
+[progress] 1380 predictions written
+[progress] 1400 predictions written
+[progress] 1420 predictions written
+[progress] 1440 predictions written
+[progress] 1460 predictions written
+[progress] 1480 predictions written
+[progress] 1500 predictions written
+[progress] 1520 predictions written
+[progress] 1540 predictions written
+[progress] 1560 predictions written
+[progress] 1580 predictions written
+[progress] 1600 predictions written
+[progress] 1620 predictions written
+[progress] 1640 predictions written
+[progress] 1660 predictions written
+[progress] 1680 predictions written
+[progress] 1700 predictions written
+[progress] 1720 predictions written
+[progress] 1740 predictions written
+[progress] 1760 predictions written
+[progress] 1780 predictions written
+[progress] 1800 predictions written
+[progress] 1820 predictions written
+[progress] 1840 predictions written
+[progress] 1860 predictions written
+[progress] 1880 predictions written
+[progress] 1900 predictions written
+[progress] 1920 predictions written
+[progress] 1940 predictions written
+[progress] 1960 predictions written
+[progress] 1980 predictions written
+[progress] 2000 predictions written
+[progress] 2020 predictions written
+[progress] 2040 predictions written
+Saved conversation log to data/predictions/mistral_7b_cot_sub256_v2_seed1_predictions_conversations.jsonl
+Saved predictions to data/predictions/mistral_7b_cot_sub256_v2_seed1_predictions.jsonl
+
+─── role=adult  gold=classical  n=512  acc=0.262  macro_F1=0.244  C_usage=0.176 ───
+  Confusion matrix (rows=gold, cols=pred):
+        pred=  A  pred=  B  pred=  C   support
+  gold=A       29        0        1        30
+  gold=B        2       22        6        30
+  gold=C      170      199       83       452
+                prec    recall        F1
+  A(Yes   )     0.144     0.967     0.251
+  B(No    )     0.100     0.733     0.175
+  C(Cannot)     0.922     0.184     0.306
+
+─── role=adult  gold=wcs  n=512  acc=0.260  macro_F1=0.244  C_usage=0.176 ───
+  Confusion matrix (rows=gold, cols=pred):
+        pred=  A  pred=  B  pred=  C   support
+  gold=A       27        2        2        31
+  gold=B        1       25        7        33
+  gold=C      173      194       81       448
+                prec    recall        F1
+  A(Yes   )     0.134     0.871     0.233
+  B(No    )     0.113     0.758     0.197
+  C(Cannot)     0.900     0.181     0.301
+
+─── role=child  gold=classical  n=512  acc=0.416  macro_F1=0.361  C_usage=0.314 ───
+  Confusion matrix (rows=gold, cols=pred):
+        pred=  A  pred=  B  pred=  C   support
+  gold=A       34        1        0        35
+  gold=B        1       25        7        33
+  gold=C      173      113      154       440
+                prec    recall        F1
+  A(Yes   )     0.163     0.971     0.280
+  B(No    )     0.180     0.758     0.291
+  C(Cannot)     0.957     0.350     0.512
+
+─── role=child  gold=wcs  n=512  acc=0.402  macro_F1=0.353  C_usage=0.314 ───
+  Confusion matrix (rows=gold, cols=pred):
+        pred=  A  pred=  B  pred=  C   support
+  gold=A       31        1        3        35
+  gold=B        0       27       10        37
+  gold=C      177      111      148       436
+                prec    recall        F1
+  A(Yes   )     0.149     0.886     0.255
+  B(No    )     0.194     0.730     0.307
+  C(Cannot)     0.919     0.339     0.496
+
+─── role=none  gold=classical  n=512  acc=0.244  macro_F1=0.228  C_usage=0.160 ───
+  Confusion matrix (rows=gold, cols=pred):
+        pred=  A  pred=  B  pred=  C   support
+  gold=A       27        1        1        29
+  gold=B        4       21        4        29
+  gold=C      227      150       77       454
+                prec    recall        F1
+  A(Yes   )     0.105     0.931     0.188
+  B(No    )     0.122     0.724     0.209
+  C(Cannot)     0.939     0.170     0.287
+
+─── role=none  gold=wcs  n=512  acc=0.254  macro_F1=0.244  C_usage=0.160 ───
+  Confusion matrix (rows=gold, cols=pred):
+        pred=  A  pred=  B  pred=  C   support
+  gold=A       33        4        1        38
+  gold=B        9       24        8        41
+  gold=C      216      144       73       433
+                prec    recall        F1
+  A(Yes   )     0.128     0.868     0.223
+  B(No    )     0.140     0.585     0.225
+  C(Cannot)     0.890     0.169     0.283
+
+─── role=teen  gold=classical  n=512  acc=0.295  macro_F1=0.270  C_usage=0.213 ───
+  Confusion matrix (rows=gold, cols=pred):
+        pred=  A  pred=  B  pred=  C   support
+  gold=A       28        5        4        37
+  gold=B        4       25        7        36
+  gold=C      174      163       98       435
+                prec    recall        F1
+  A(Yes   )     0.136     0.757     0.230
+  B(No    )     0.130     0.694     0.218
+  C(Cannot)     0.899     0.225     0.360
+
+─── role=teen  gold=wcs  n=512  acc=0.275  macro_F1=0.253  C_usage=0.213 ───
+  Confusion matrix (rows=gold, cols=pred):
+        pred=  A  pred=  B  pred=  C   support
+  gold=A       24        4        8        36
+  gold=B        3       26       10        39
+  gold=C      179      163       91       433
+                prec    recall        F1
+  A(Yes   )     0.117     0.667     0.198
+  B(No    )     0.135     0.667     0.224
+  C(Cannot)     0.835     0.210     0.336
+
+Saved metrics to outputs/mistral_7b_cot_sub256_v2_seed1_outputs_log.csv
+
+Job 4082009 consumed 13.4 billing hours from project ec403.
+
+Submitted 2026-08-21T13:51:13; waited 2.0 seconds in the queue after becoming eligible to run.
+
+Requested wallclock time: 2.0 hours
+Elapsed wallclock time:   42.4 minutes
+
+Job exited normally.
+
+Task and CPU statistics:
+ID             CPUs  Tasks  CPU util                Start   Elapsed  Exit status
+4082009           4            0.0 %  2026-08-21T13:51:15  2546.0 s  0
+4082009.batch     4      1    24.5 %  2026-08-21T13:51:15  2546.0 s  0
+
+Used CPU time:   41.6 CPU minutes
+Unused CPU time: 2.1 CPU hours
+
+Memory statistics, in GiB:
+ID              Alloc   Usage
+4082009          40.0        
+4082009.batch    40.0     5.9
+
+Job 4082009 completed at Fri Aug 21 14:33:41 CEST 2026

@@ -1,0 +1,143 @@
+Starting job 4082003 on gpu-7 on Fox at Fri Aug 21 13:51:15 CEST 2026
+
+[progress] 20 predictions written
+[progress] 40 predictions written
+[progress] 60 predictions written
+[progress] 80 predictions written
+[progress] 100 predictions written
+[progress] 120 predictions written
+[progress] 140 predictions written
+[progress] 160 predictions written
+[progress] 180 predictions written
+[progress] 200 predictions written
+[progress] 220 predictions written
+[progress] 240 predictions written
+[progress] 260 predictions written
+[progress] 280 predictions written
+[progress] 300 predictions written
+[progress] 320 predictions written
+[progress] 340 predictions written
+[progress] 360 predictions written
+[progress] 380 predictions written
+[progress] 400 predictions written
+[progress] 420 predictions written
+[progress] 440 predictions written
+[progress] 460 predictions written
+[progress] 480 predictions written
+[progress] 500 predictions written
+Saved conversation log to data/predictions/deepseek_8b_cot1024_sub64_v2_seed0_predictions_conversations.jsonl
+Saved predictions to data/predictions/deepseek_8b_cot1024_sub64_v2_seed0_predictions.jsonl
+
+─── role=adult  gold=classical  n=136  acc=0.441  macro_F1=0.345  C_usage=0.368 ───
+  Confusion matrix (rows=gold, cols=pred):
+        pred=  A  pred=  B  pred=  C   support
+  gold=A        7        0        0         7
+  gold=B        0        5        2         7
+  gold=C       42       32       48       122
+                prec    recall        F1
+  A(Yes   )     0.143     1.000     0.250
+  B(No    )     0.135     0.714     0.227
+  C(Cannot)     0.960     0.393     0.558
+
+─── role=adult  gold=wcs  n=136  acc=0.426  macro_F1=0.314  C_usage=0.368 ───
+  Confusion matrix (rows=gold, cols=pred):
+        pred=  A  pred=  B  pred=  C   support
+  gold=A        4        0        1         5
+  gold=B        0        5        0         5
+  gold=C       45       32       49       126
+                prec    recall        F1
+  A(Yes   )     0.082     0.800     0.148
+  B(No    )     0.135     1.000     0.238
+  C(Cannot)     0.980     0.389     0.557
+
+─── role=child  gold=classical  n=136  acc=0.500  macro_F1=0.493  C_usage=0.294 ───
+  Confusion matrix (rows=gold, cols=pred):
+        pred=  A  pred=  B  pred=  C   support
+  gold=A       16        0        1        17
+  gold=B        0       15        2        17
+  gold=C       37       28       37       102
+                prec    recall        F1
+  A(Yes   )     0.302     0.941     0.457
+  B(No    )     0.349     0.882     0.500
+  C(Cannot)     0.925     0.363     0.521
+
+─── role=child  gold=wcs  n=136  acc=0.404  macro_F1=0.354  C_usage=0.294 ───
+  Confusion matrix (rows=gold, cols=pred):
+        pred=  A  pred=  B  pred=  C   support
+  gold=A        8        0        0         8
+  gold=B        0        8        1         9
+  gold=C       45       35       39       119
+                prec    recall        F1
+  A(Yes   )     0.151     1.000     0.262
+  B(No    )     0.186     0.889     0.308
+  C(Cannot)     0.975     0.328     0.491
+
+─── role=none  gold=classical  n=88  acc=0.625  macro_F1=0.446  C_usage=0.557 ───
+  Confusion matrix (rows=gold, cols=pred):
+        pred=  A  pred=  B  pred=  C   support
+  gold=A        4        0        0         4
+  gold=B        0        3        1         4
+  gold=C       16       16       48        80
+                prec    recall        F1
+  A(Yes   )     0.200     1.000     0.333
+  B(No    )     0.158     0.750     0.261
+  C(Cannot)     0.980     0.600     0.744
+
+─── role=none  gold=wcs  n=88  acc=0.602  macro_F1=0.412  C_usage=0.557 ───
+  Confusion matrix (rows=gold, cols=pred):
+        pred=  A  pred=  B  pred=  C   support
+  gold=A        4        0        0         4
+  gold=B        0        2        2         4
+  gold=C       16       17       47        80
+                prec    recall        F1
+  A(Yes   )     0.200     1.000     0.333
+  B(No    )     0.105     0.500     0.174
+  C(Cannot)     0.959     0.588     0.729
+
+─── role=teen  gold=classical  n=152  acc=0.368  macro_F1=0.339  C_usage=0.243 ───
+  Confusion matrix (rows=gold, cols=pred):
+        pred=  A  pred=  B  pred=  C   support
+  gold=A       11        0        0        11
+  gold=B        1        9        1        11
+  gold=C       53       41       36       130
+                prec    recall        F1
+  A(Yes   )     0.169     1.000     0.289
+  B(No    )     0.180     0.818     0.295
+  C(Cannot)     0.973     0.277     0.431
+
+─── role=teen  gold=wcs  n=152  acc=0.401  macro_F1=0.386  C_usage=0.243 ───
+  Confusion matrix (rows=gold, cols=pred):
+        pred=  A  pred=  B  pred=  C   support
+  gold=A       12        0        1        13
+  gold=B        1       13        0        14
+  gold=C       52       37       36       125
+                prec    recall        F1
+  A(Yes   )     0.185     0.923     0.308
+  B(No    )     0.260     0.929     0.406
+  C(Cannot)     0.973     0.288     0.444
+
+Saved metrics to outputs/deepseek_8b_cot1024_sub64_v2_seed0_outputs_log.csv
+
+Job 4082003 consumed 64.7 billing hours from project ec403.
+
+Submitted 2026-08-21T13:51:09; waited 6.0 seconds in the queue after becoming eligible to run.
+
+Requested wallclock time: 10.0 hours
+Elapsed wallclock time:   3.4 hours
+
+Job exited normally.
+
+Task and CPU statistics:
+ID             CPUs  Tasks  CPU util                Start  Elapsed  Exit status
+4082003           4            0.0 %  2026-08-21T13:51:15    3.4 h  0
+4082003.batch     4      1    24.7 %  2026-08-21T13:51:15    3.4 h  0
+
+Used CPU time:   3.4 CPU hours
+Unused CPU time: 10.2 CPU hours
+
+Memory statistics, in GiB:
+ID              Alloc   Usage
+4082003          40.0        
+4082003.batch    40.0     5.1
+
+Job 4082003 completed at Fri Aug 21 17:15:33 CEST 2026

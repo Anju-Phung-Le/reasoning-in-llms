@@ -1,0 +1,5 @@
+role,n,c_usage,acc_classical,macro_f1_classical,f1_A_classical,f1_B_classical,f1_C_classical,recall_C_classical,precision_C_classical,acc_wcs,macro_f1_wcs,f1_A_wcs,f1_B_wcs,f1_C_wcs,recall_C_wcs,precision_C_wcs,delta_acc_wcs_minus_classical,delta_macro_f1_wcs_minus_classical
+adult,512,0.18,0.26,0.24,0.229,0.182,0.31,0.187,0.913,0.262,0.244,0.219,0.204,0.309,0.186,0.902,0.002,0.004
+child,512,0.318,0.416,0.356,0.291,0.262,0.514,0.352,0.951,0.4,0.344,0.256,0.281,0.496,0.34,0.914,-0.016,-0.011
+none,512,0.158,0.242,0.228,0.195,0.208,0.28,0.165,0.926,0.25,0.24,0.23,0.215,0.276,0.164,0.877,0.008,0.013
+teen,512,0.221,0.301,0.272,0.252,0.196,0.368,0.232,0.894,0.279,0.255,0.196,0.228,0.34,0.214,0.823,-0.021,-0.017
