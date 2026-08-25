@@ -271,21 +271,22 @@ def main():
             "(nucleus, $T=0.6$, $p=0.95$). $\\Delta$ denotes the WCS match "
             "rate minus the Classical match rate.}\n"
             "\\label{tab:disagreement-neutral-cot}\n"
-            "\\begin{tabular}{lrrrr}\n"
+            "\\begin{tabular}{lrrrrr}\n"
             "\\toprule\n"
-            "Model & Classical (\\%) & WCS (\\%) & Neither (\\%) & $\\Delta$ \\\\\n"
+            "Model & $N$ & Classical (\\%) & WCS (\\%) & Neither (\\%) & $\\Delta$ \\\\\n"
             "\\midrule\n"
         )
         for model, rows in per_model.items():
             if not rows:
                 continue
+            n_dis = rows[0]["n_disagreement"]
             c_m, c_s = mean_std([r["classical_match_pct"] for r in rows])
             w_m, w_s = mean_std([r["wcs_match_pct"] for r in rows])
             n_m, n_s = mean_std([r["neither_pct"] for r in rows])
             delta = [r["wcs_match_pct"] - r["classical_match_pct"] for r in rows]
             d_m, d_s = mean_std(delta)
             f.write(
-                f"{model} & {fmt(c_m, c_s)} & {fmt(w_m, w_s)} & "
+                f"{model} & {n_dis} & {fmt(c_m, c_s)} & {fmt(w_m, w_s)} & "
                 f"{fmt(n_m, n_s)} & {d_m:+.2f} $\\pm$ {d_s:.2f} \\\\\n"
             )
         f.write("\\bottomrule\n\\end{tabular}\n\\end{table}\n")
