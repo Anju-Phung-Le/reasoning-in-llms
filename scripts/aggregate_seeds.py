@@ -255,6 +255,42 @@ def main():
             m, s = mean_std([r[k] for r in rows])
             print(f"  {k:<26}: {m:6.2f} +/- {s:.2f}")
 
+    # ---------------- LaTeX for Table 4.2 ----------------
+    tex_path = OUTPUT_DIR / "seeds_disagreement_none_cot.tex"
+
+    def fmt(m, s):
+        return f"{m:.2f} $\\pm$ {s:.2f}"
+
+    with open(tex_path, "w", encoding="utf-8") as f:
+        f.write(
+            "\\begin{table}[htbp]\n"
+            "\\caption{Model responses on question instances where Classical "
+            "Logic and Weak Completion Semantics (WCS) assign different gold "
+            "labels in the neutral role condition, with chain-of-thought "
+            "prompting. Values are mean $\\pm$ std across sampling seeds "
+            "(nucleus, $T=0.6$, $p=0.95$). $\\Delta$ denotes the WCS match "
+            "rate minus the Classical match rate.}\n"
+            "\\label{tab:disagreement-neutral-cot}\n"
+            "\\begin{tabular}{lrrrr}\n"
+            "\\toprule\n"
+            "Model & Classical (\\%) & WCS (\\%) & Neither (\\%) & $\\Delta$ \\\\\n"
+            "\\midrule\n"
+        )
+        for model, rows in per_model.items():
+            if not rows:
+                continue
+            c_m, c_s = mean_std([r["classical_match_pct"] for r in rows])
+            w_m, w_s = mean_std([r["wcs_match_pct"] for r in rows])
+            n_m, n_s = mean_std([r["neither_pct"] for r in rows])
+            delta = [r["wcs_match_pct"] - r["classical_match_pct"] for r in rows]
+            d_m, d_s = mean_std(delta)
+            f.write(
+                f"{model} & {fmt(c_m, c_s)} & {fmt(w_m, w_s)} & "
+                f"{fmt(n_m, n_s)} & {d_m:+.2f} $\\pm$ {d_s:.2f} \\\\\n"
+            )
+        f.write("\\bottomrule\n\\end{tabular}\n\\end{table}\n")
+    print(f"Wrote {tex_path}")
+
 
 if __name__ == "__main__":
     main()

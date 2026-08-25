@@ -263,7 +263,6 @@ def main():
     latex_df = df[
         [
             "model",
-            "n_disagreement",
             "classical_match_pct",
             "wcs_match_pct",
             "neither_pct",
@@ -273,11 +272,10 @@ def main():
 
     latex_df.columns = [
         "Model",
-        "$N$",
         "Classical (\\%)",
         "WCS (\\%)",
         "Neither (\\%)",
-        "$\\Delta$ (pp)",
+        "$\\Delta$",
     ]
 
     # Format numbers exactly as we want them to appear in the thesis
@@ -293,22 +291,21 @@ def main():
         "Neither (\\%)"
     ].map(lambda x: f"{x:.2f}")
 
-    latex_df["$\\Delta$ (pp)"] = latex_df[
-        "$\\Delta$ (pp)"
+    latex_df["$\\Delta$"] = latex_df[
+        "$\\Delta$"
     ].map(lambda x: f"{x:+.2f}")
 
     latex = latex_df.to_latex(
         index=False,
         escape=False,
-        column_format="lrrrrr",
+        column_format="lrrrr",
         position="htbp",
         caption=(
             "Model responses on question instances where Classical Logic "
             "and Weak Completion Semantics (WCS) assign different gold "
             "labels in the neutral role condition. "
-            "$N$ denotes the number of disagreement instances and "
             "$\\Delta$ denotes the WCS match rate minus the Classical "
-            "match rate in percentage points."
+            "match rate."
         ),
         label="tab:disagreement-neutral",
     )
