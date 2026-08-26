@@ -1,3 +1,0 @@
-model,n_disagreement,overall_nvc_pct,disagreement_nvc_pct,classical_match_pct,wcs_match_pct
-DeepSeek,12,31.82,16.67,50.0,50.0
-Mistral,12,13.67,8.33,58.33,33.33

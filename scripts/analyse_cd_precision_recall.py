@@ -305,7 +305,7 @@ def main():
     print(f"Wrote {main_tex}")
 
     # Bucket table: Cannot-determine rate by (classical C, WCS C) status
-    bucket_tex = OUTPUT_DIR / "cd_analysis_buckets.tex"
+    bucket_tex = OUTPUT_DIR / "cd_analysis_frameworks.tex"
     with open(bucket_tex, "w", encoding="utf-8") as f:
         f.write(
             "\\begin{table}[htbp]\n"
