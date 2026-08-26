@@ -1,0 +1,12 @@
+\begin{table}[htbp]
+\caption{Model responses on question instances where Classical Logic and Weak Completion Semantics (WCS) assign different gold labels in the neutral role condition, with chain-of-thought prompting. Values are mean $\pm$ std across sampling seeds (nucleus, $T=0.6$, $p=0.95$). $\Delta$ denotes the WCS match rate minus the Classical match rate.}
+\label{tab:disagreement-neutral-cot}
+\begin{tabular}{lrrrrr}
+\toprule
+Model & $N$ & Classical (\%) & WCS (\%) & Neither (\%) & $\Delta$ \\
+\midrule
+DeepSeek-8B & 12 & 66.67 $\pm$ 10.21 & 33.33 $\pm$ 10.21 & 0.00 $\pm$ 0.00 & -33.33 $\pm$ 20.41 \\
+Mistral-7B & 69 & 36.59 $\pm$ 2.48 & 44.93 $\pm$ 1.18 & 18.12 $\pm$ 1.87 & +8.33 $\pm$ 3.21 \\
+\bottomrule
+\end{tabular}
+\end{table}

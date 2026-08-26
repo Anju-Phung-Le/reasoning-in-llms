@@ -1,0 +1,3 @@
+model,n_overall,gold_classical_A_pct,gold_classical_B_pct,gold_classical_NVC_pct,gold_wcs_A_pct,gold_wcs_B_pct,gold_wcs_NVC_pct
+DeepSeek-8B,88,4.55,4.55,90.91,4.55,4.55,90.91
+Mistral-7B,512,5.66,5.66,88.67,7.42,8.01,84.57

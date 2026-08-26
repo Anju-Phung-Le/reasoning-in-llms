@@ -26,7 +26,7 @@ For each model, aggregated as mean +/- std across seeds:
 Encoding: pred_index 0 = A, 1 = B, 2 = NVC.
 
 Writes:
-  outputs/report/nvc_analysis_summary.csv
+  outputs/report/cd_analysis_summary.csv
 """
 
 import csv
@@ -252,7 +252,7 @@ def main():
 
     # Write CSVs
     if gold_rows:
-        gold_path = OUTPUT_DIR / "nvc_gold_distribution.csv"
+        gold_path = OUTPUT_DIR / "cd_gold_distribution.csv"
         with open(gold_path, "w", newline="", encoding="utf-8") as f:
             w = csv.DictWriter(f, fieldnames=list(gold_rows[0].keys()))
             w.writeheader()
@@ -260,7 +260,7 @@ def main():
         print(f"Wrote {gold_path}")
 
     if csv_rows:
-        analysis_path = OUTPUT_DIR / "nvc_analysis_summary.csv"
+        analysis_path = OUTPUT_DIR / "cd_analysis_summary.csv"
         with open(analysis_path, "w", newline="", encoding="utf-8") as f:
             w = csv.DictWriter(f, fieldnames=list(csv_rows[0].keys()))
             w.writeheader()
@@ -273,21 +273,24 @@ def main():
     def fmt(m, s):
         return f"{m:.2f} $\\pm$ {s:.2f}"
 
-    # Main table: precision / recall / F1 + overall NVC rate
-    main_tex = OUTPUT_DIR / "nvc_analysis_main.tex"
+    # Main table: precision / recall / F1 + overall Cannot-determine rate
+    main_tex = OUTPUT_DIR / "cd_analysis_main.tex"
     with open(main_tex, "w", encoding="utf-8") as f:
         f.write(
             "\\begin{table}[htbp]\n"
-            "\\caption{NVC prediction quality on seeded CoT runs. "
-            "``NVC precision'' is the fraction of model-NVC answers where at "
-            "least one framework (Classical Logic or WCS) assigns NVC as gold. "
-            "``NVC recall'' is the fraction of items with at least one NVC gold "
-            "where the model answers NVC. Values are mean $\\pm$ std across "
-            "sampling seeds (nucleus, $T=0.6$, $p=0.95$).}\n"
-            "\\label{tab:nvc-analysis}\n"
+            "\\caption{Model use of the \\emph{Cannot determine} response "
+            "(option C) on seeded CoT runs. Note that this measures the "
+            "per-conclusion `Cannot determine' answer, not syllogism-level "
+            "NVC in the sense of Weak Completion Semantics. Precision is the "
+            "fraction of `Cannot determine' answers where at least one "
+            "framework (Classical Logic or WCS) assigns C as the gold label. "
+            "Recall is the fraction of items with at least one C gold where "
+            "the model answers `Cannot determine'. Values are mean $\\pm$ "
+            "std across sampling seeds (nucleus, $T=0.6$, $p=0.95$).}\n"
+            "\\label{tab:cannot-determine-analysis}\n"
             "\\begin{tabular}{lrrrrr}\n"
             "\\toprule\n"
-            "Model & $N$ & Overall NVC (\\%) & Precision (\\%) & Recall (\\%) & F1 (\\%) \\\\\n"
+            "Model & $N$ & Overall CD (\\%) & Precision (\\%) & Recall (\\%) & F1 (\\%) \\\\\n"
             "\\midrule\n"
         )
         for r in csv_rows:
@@ -301,20 +304,21 @@ def main():
         f.write("\\bottomrule\n\\end{tabular}\n\\end{table}\n")
     print(f"Wrote {main_tex}")
 
-    # Bucket table: NVC rate by (classical NVC, WCS NVC) status
-    bucket_tex = OUTPUT_DIR / "nvc_analysis_buckets.tex"
+    # Bucket table: Cannot-determine rate by (classical C, WCS C) status
+    bucket_tex = OUTPUT_DIR / "cd_analysis_buckets.tex"
     with open(bucket_tex, "w", encoding="utf-8") as f:
         f.write(
             "\\begin{table}[htbp]\n"
-            "\\caption{Model NVC rate on (item, conclusion) pairs, grouped by "
-            "whether each framework assigns NVC as the gold label. "
-            "``Both'' = both frameworks say NVC; ``Only Cls.'' = only Classical "
-            "Logic; ``Only WCS'' = only WCS; ``Neither'' = neither framework "
-            "says NVC. Values are mean $\\pm$ std across sampling seeds.}\n"
-            "\\label{tab:nvc-buckets}\n"
+            "\\caption{Model `Cannot determine' rate on (item, conclusion) "
+            "pairs, grouped by whether each framework assigns C (Cannot "
+            "determine) as the gold label. ``Both'' = both frameworks say C; "
+            "``Only Cls.'' = only Classical Logic; ``Only WCS'' = only WCS; "
+            "``Neither'' = neither framework says C. Values are mean $\\pm$ "
+            "std across sampling seeds.}\n"
+            "\\label{tab:cannot-determine-buckets}\n"
             "\\begin{tabular}{lrrrrr}\n"
             "\\toprule\n"
-            "Model & Bucket & $n$ & NVC rate (\\%) & & \\\\\n"
+            "Model & Bucket & $n$ & CD rate (\\%) & & \\\\\n"
             "\\midrule\n"
         )
         for r in csv_rows:
@@ -337,7 +341,7 @@ def main():
 
     # Gold distribution table
     if gold_rows:
-        gold_tex = OUTPUT_DIR / "nvc_gold_distribution.tex"
+        gold_tex = OUTPUT_DIR / "cd_gold_distribution.tex"
         with open(gold_tex, "w", encoding="utf-8") as f:
             f.write(
                 "\\begin{table}[htbp]\n"

@@ -9,10 +9,10 @@ Prints:
   3. How often each model picks NVC on disagreement items vs. overall.
 
 Also writes:
-  - outputs/report/analyse_nvc_disagreement_rows.csv
+  - outputs/report/analyse_cd_disagreement_rows.csv
       one row per (item, conclusion) disagreement instance, with gold labels
       and each model's prediction.
-  - outputs/report/analyse_nvc_summary.csv
+  - outputs/report/analyse_cd_summary.csv
       one row per model, with overall NVC%, disagreement-subset NVC%,
       classical-match%, and WCS-match%.
 
@@ -34,8 +34,8 @@ MODEL_FILES = {
 }
 
 OUTPUT_DIR = Path("outputs/report")
-ROWS_CSV = OUTPUT_DIR / "analyse_nvc_disagreement_rows.csv"
-SUMMARY_CSV = OUTPUT_DIR / "analyse_nvc_summary.csv"
+ROWS_CSV = OUTPUT_DIR / "analyse_cd_disagreement_rows.csv"
+SUMMARY_CSV = OUTPUT_DIR / "analyse_cd_summary.csv"
 
 
 def load_jsonl_by_id(path):

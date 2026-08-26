@@ -1,0 +1,9 @@
+model,regime,role,n_diagnostic,pct_classical,pct_wcs,pct_neither,pct_unparsed
+deepseek_8b,CoT-1024 sub64,all,104,52.9,44.2,2.9,0.0
+deepseek_8b,CoT-384 sub256,all,349,26.6,33.0,38.7,1.7
+deepseek_8b,forced-choice,all,5120,22.4,24.7,52.9,0.0
+flan_t5_base3,forced-choice,all,5120,37.5,45.4,17.0,0.0
+flan_t5_large3,forced-choice,all,5120,39.0,39.5,21.4,0.0
+flan_t5_small4,forced-choice,all,5120,22.5,30.0,47.5,0.0
+mistral_7b,CoT-384 sub256,all,349,45.0,42.4,12.3,0.3
+mistral_7b,forced-choice,all,5120,42.2,49.3,8.6,0.0

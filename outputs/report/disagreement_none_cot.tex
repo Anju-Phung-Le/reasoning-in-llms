@@ -1,0 +1,12 @@
+\begin{table}
+\caption{Cross-model behaviour on disagreement items (CoT mode). Filtered to 64 common items.}
+\label{tab:disagreement_none_cot}
+\begin{tabular}{lrrrrrr}
+\toprule
+model & n_disagreement & classical_match_pct & wcs_match_pct & neither_pct & unparsed_pct & wcs_minus_classical_pp \\
+\midrule
+DeepSeek-8B (CoT, 1024) & 12 & 50.00 & 50.00 & 0.00 & 0.00 & 0.00 \\
+Mistral-7B (CoT, 128) & 12 & 58.33 & 33.33 & 8.33 & 0.00 & -25.00 \\
+\bottomrule
+\end{tabular}
+\end{table}

@@ -1,0 +1,13 @@
+id,conclusion_code,classical_gold,wcs_gold,DeepSeek_pred,Mistral_pred
+ex8057ff74_none,Aac,B(No),C(NVC),C(NVC),B(No)
+ex8057ff74_none,Oac,A(Yes),C(NVC),A(Yes),A(Yes)
+ex83bc71b1_none,Aac,C(NVC),B(No),C(NVC),C(NVC)
+ex83bc71b1_none,Oac,C(NVC),A(Yes),A(Yes),A(Yes)
+ex93ad68f8_none,Aca,C(NVC),B(No),B(No),B(No)
+ex93ad68f8_none,Oca,C(NVC),A(Yes),A(Yes),A(Yes)
+exb788492d_none,Aca,B(No),C(NVC),B(No),B(No)
+exb788492d_none,Oca,A(Yes),C(NVC),A(Yes),A(Yes)
+exde7c7538_none,Aac,C(NVC),B(No),B(No),A(Yes)
+exde7c7538_none,Oac,C(NVC),A(Yes),A(Yes),A(Yes)
+exf8e37723_none,Aac,B(No),C(NVC),B(No),B(No)
+exf8e37723_none,Oac,A(Yes),C(NVC),A(Yes),A(Yes)

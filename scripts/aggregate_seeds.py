@@ -18,7 +18,7 @@ Then aggregates mean and std across seeds.
 Writes:
   outputs/report/seeds_per_seed.csv          # one row per (model, seed)
   outputs/report/seeds_mean_std.csv          # one row per model with mean +/- std
-  outputs/report/seeds_nvc_disagreement.csv  # NVC-focused, mean +/- std per model
+  outputs/report/seeds_cd_disagreement.csv   # Cannot-determine focused, mean +/- std per model
   outputs/report/seeds_disagreement_none_cot.csv
                                              # replicates disagreement_none_cot format,
                                              # mean +/- std across seeds
@@ -187,7 +187,7 @@ def main():
     print(f"Wrote {summary_path}")
 
     # ---------------- NVC-focused (mean +/- std) ----------------
-    nvc_path = OUTPUT_DIR / "seeds_nvc_disagreement.csv"
+    nvc_path = OUTPUT_DIR / "seeds_cd_disagreement.csv"
     with open(nvc_path, "w", newline="", encoding="utf-8") as f:
         w = csv.writer(f)
         w.writerow([

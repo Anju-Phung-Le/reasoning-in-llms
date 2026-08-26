@@ -1,0 +1,12 @@
+\begin{table}[htbp]
+\caption{Model use of the \emph{Cannot determine} response (option C) on seeded CoT runs. Note that this measures the per-conclusion `Cannot determine' answer, not syllogism-level NVC in the sense of Weak Completion Semantics. Precision is the fraction of `Cannot determine' answers where at least one framework (Classical Logic or WCS) assigns C as the gold label. Recall is the fraction of items with at least one C gold where the model answers `Cannot determine'. Values are mean $\pm$ std across sampling seeds (nucleus, $T=0.6$, $p=0.95$).}
+\label{tab:cannot-determine-analysis}
+\begin{tabular}{lrrrrr}
+\toprule
+Model & $N$ & Overall CD (\%) & Precision (\%) & Recall (\%) & F1 (\%) \\
+\midrule
+DeepSeek-8B & 88 & 52.05 $\pm$ 2.71 & 97.83 $\pm$ 1.54 & 52.09 $\pm$ 2.65 & 67.95 $\pm$ 2.30 \\
+Mistral-7B & 512 & 16.21 $\pm$ 0.36 & 97.89 $\pm$ 0.59 & 17.00 $\pm$ 0.36 & 28.96 $\pm$ 0.52 \\
+\bottomrule
+\end{tabular}
+\end{table}

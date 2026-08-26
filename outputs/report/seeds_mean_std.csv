@@ -1,0 +1,3 @@
+model,n_seeds,overall_A_pct_mean,overall_A_pct_std,overall_B_pct_mean,overall_B_pct_std,overall_C_pct_mean,overall_C_pct_std,classical_match_pct_mean,classical_match_pct_std,wcs_match_pct_mean,wcs_match_pct_std,neither_pct_mean,neither_pct_std,unparsed_pct_mean,unparsed_pct_std,disagreement_nvc_pct_mean,disagreement_nvc_pct_std
+DeepSeek-8B,5,28.41,3.85,19.55,3.25,52.05,2.71,66.67,10.21,33.33,10.21,0.0,0.0,0.0,0.0,23.33,10.87
+Mistral-7B,4,50.63,0.49,33.01,0.89,16.21,0.36,36.59,2.48,44.93,1.18,18.12,1.87,0.36,0.72,16.3,2.17

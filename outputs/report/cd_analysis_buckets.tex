@@ -1,0 +1,20 @@
+\begin{table}[htbp]
+\caption{Model `Cannot determine' rate on (item, conclusion) pairs, grouped by whether each framework assigns C (Cannot determine) as the gold label. ``Both'' = both frameworks say C; ``Only Cls.'' = only Classical Logic; ``Only WCS'' = only WCS; ``Neither'' = neither framework says C. Values are mean $\pm$ std across sampling seeds.}
+\label{tab:cannot-determine-buckets}
+\begin{tabular}{lrrrrr}
+\toprule
+Model & Bucket & $n$ & CD rate (\%) & & \\
+\midrule
+DeepSeek-8B & Both & 74 & 56.76 $\pm$ 4.58 & & \\
+ & Only Cls. & 6 & 40.00 $\pm$ 19.00 & & \\
+ & Only WCS & 6 & 6.67 $\pm$ 9.13 & & \\
+ & Neither & 2 & 50.00 $\pm$ 35.36 & & \\
+\midrule
+Mistral-7B & Both & 409 & 17.11 $\pm$ 0.63 & & \\
+ & Only Cls. & 45 & 16.67 $\pm$ 2.22 & & \\
+ & Only WCS & 24 & 15.62 $\pm$ 2.08 & & \\
+ & Neither & 34 & 5.15 $\pm$ 1.47 & & \\
+\midrule
+\bottomrule
+\end{tabular}
+\end{table}
