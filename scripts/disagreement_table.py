@@ -24,9 +24,10 @@ MODEL_FILES = {
     "Mistral-7B": Path(
         "data/predictions/mistral_7b_all_forms_predictions.jsonl"
     ),
-    "DeepSeek-8B": Path(
-        "data/predictions/deepseek_8b_all_forms_predictions.jsonl"
-    ),
+    # DeepSeek-R1-Distill-Llama-8B is excluded from the no-CoT table:
+    # its chat template prepends <think>, so a forced next-token argmax
+    # over {A,B,C} probes first-token prior rather than syllogistic
+    # judgement. DeepSeek is evaluated in the CoT condition (Table 4.2).
 }
 
 # Main analysis uses the neutral role only
