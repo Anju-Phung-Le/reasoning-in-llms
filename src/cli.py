@@ -37,6 +37,31 @@ def main():
     p_pred.add_argument("--top-p", dest="top_p", type=float, default=0.95,
                         help="Nucleus sampling top-p (default: 0.95).")
     p_pred.add_argument("--thinking", action="store_true", help="Enable thinking mode.")
+    p_pred.add_argument("--backend", choices=["hf", "vllm"], default="hf",
+                        help="Inference backend (default: hf). vllm batches across "
+                             "prompts and is far faster, but does not support "
+                             "encoder-decoder models such as Flan-T5.")
+    p_pred.add_argument("--tensor-parallel-size", dest="tensor_parallel_size",
+                        type=int, default=1,
+                        help="vLLM only: GPUs to shard across (default: 1). "
+                             "Must be a power of two and divide the head count.")
+    p_pred.add_argument("--max-model-len", dest="max_model_len", type=int,
+                        default=4096,
+                        help="vLLM only: KV cache context cap (default: 4096). "
+                             "Must exceed prompt + --cot-max-new-tokens.")
+    p_pred.add_argument("--gpu-memory-utilization", dest="gpu_memory_utilization",
+                        type=float, default=0.90,
+                        help="vLLM only: fraction of each GPU vLLM may use "
+                             "(default: 0.90).")
+    p_pred.add_argument("--chunk-items", dest="chunk_items", type=int, default=512,
+                        help="vLLM only: dataset items generated per batch before "
+                             "results are flushed to disk (default: 512).")
+    p_pred.add_argument("--n-samples", dest="n_samples", type=int, default=1,
+                        help="vLLM only: independent continuations to draw per "
+                             "prompt in one pass, written to <out>_sample0.jsonl, "
+                             "_sample1, ... (default: 1, which keeps the plain "
+                             "filename). Replaces a multi-job seed sweep with a "
+                             "single model load. Requires --cot and --do-sample.")
 
     # eval command - eval.py evaluate()
     p_eval = subparsers.add_parser("eval", help="Evaluate predictions.")
@@ -65,15 +90,32 @@ def main():
     elif args.cmd == "expand":
         expand_roles(args.inp, args.out)
     elif args.cmd == "predict":
-        predict(args.model, args.data, args.out,
-                log_fp=args.log,
-                cot=args.cot,
-                cot_max_new_tokens=args.cot_max_new_tokens,
-                do_sample=args.do_sample,
-                seed=args.seed,
-                temperature=args.temperature,
-                top_p=args.top_p,
-                thinking=args.thinking)
+        common = dict(
+            log_fp=args.log,
+            cot=args.cot,
+            cot_max_new_tokens=args.cot_max_new_tokens,
+            do_sample=args.do_sample,
+            seed=args.seed,
+            temperature=args.temperature,
+            top_p=args.top_p,
+            thinking=args.thinking,
+        )
+        if args.backend == "vllm":
+            # Imported here, not at module scope: vllm is only installed on the
+            # cluster, and `gen`/`expand`/`eval` must keep working without it.
+            from .infer_vllm import predict_vllm
+            predict_vllm(args.model, args.data, args.out,
+                         tensor_parallel_size=args.tensor_parallel_size,
+                         max_model_len=args.max_model_len,
+                         gpu_memory_utilization=args.gpu_memory_utilization,
+                         chunk_items=args.chunk_items,
+                         n_samples=args.n_samples,
+                         **common)
+        else:
+            if args.n_samples != 1:
+                parser.error("--n-samples is a vLLM-only flag; the HF backend "
+                             "generates one continuation per prompt.")
+            predict(args.model, args.data, args.out, **common)
     elif args.cmd == "eval":
         evaluate(args.gold, args.pred, args.out)
 
