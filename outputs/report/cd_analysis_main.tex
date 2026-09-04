@@ -1,12 +1,16 @@
 \begin{table}[htbp]
 \caption{Model use of the \emph{Cannot determine} response (option C) on seeded CoT runs. Note that this measures the per-conclusion `Cannot determine' answer, not syllogism-level NVC in the sense of Weak Completion Semantics. Precision is the fraction of `Cannot determine' answers where at least one framework (Classical Logic or WCS) assigns C as the gold label. Recall is the fraction of items with at least one C gold where the model answers `Cannot determine'. Values are mean $\pm$ std across sampling seeds (nucleus, $T=0.6$, $p=0.95$).}
 \label{tab:cannot-determine-analysis}
-\begin{tabular}{lrrrrr}
+\begin{tabular}{lrrrr}
 \toprule
-Model & $N$ & Overall CD (\%) & Precision (\%) & Recall (\%) & F1 (\%) \\
+Model & Overall CD (\%) & Precision (\%) & Recall (\%) & F1 (\%) \\
 \midrule
-DeepSeek-8B & 88 & 52.05 $\pm$ 2.71 & 97.83 $\pm$ 1.54 & 52.09 $\pm$ 2.65 & 67.95 $\pm$ 2.30 \\
-Mistral-7B & 512 & 16.21 $\pm$ 0.36 & 97.89 $\pm$ 0.59 & 17.00 $\pm$ 0.36 & 28.96 $\pm$ 0.52 \\
+Mistral-7B & 16.66 $\pm$ 0.63 & 98.12 $\pm$ 0.62 & 17.51 $\pm$ 0.69 & 29.71 $\pm$ 1.00 \\
+Llama-3.1-8B & 29.71 $\pm$ 1.61 & 98.96 $\pm$ 0.42 & 31.49 $\pm$ 1.64 & 47.75 $\pm$ 1.88 \\
+OLMo-2-13B & 20.39 $\pm$ 1.10 & 97.63 $\pm$ 1.30 & 21.32 $\pm$ 1.10 & 34.98 $\pm$ 1.50 \\
+DeepSeek-R1-Distill-Llama-8B & 38.32 $\pm$ 1.20 & 99.18 $\pm$ 0.49 & 40.71 $\pm$ 1.30 & 57.72 $\pm$ 1.33 \\
+DeepSeek-R1-Distill-Qwen-14B & 66.48 $\pm$ 1.43 & 100.00 $\pm$ 0.00 & 71.21 $\pm$ 1.53 & 83.18 $\pm$ 1.05 \\
+Mistral-Small-24B & 68.67 $\pm$ 1.01 & 99.43 $\pm$ 0.18 & 73.14 $\pm$ 1.01 & 84.28 $\pm$ 0.65 \\
 \bottomrule
 \end{tabular}
 \end{table}

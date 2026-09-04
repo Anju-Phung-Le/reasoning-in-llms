@@ -36,14 +36,60 @@ GOLD_FILE = Path("data/processed/dataset_all_forms.jsonl")
 PRED_DIR = Path("data/predictions")
 OUTPUT_DIR = Path("outputs/report")
 
+
+def _vllm_files(subdir, prefix, seeds):
+    return [f"vllm/{subdir}/{prefix}{s}.jsonl" for s in seeds]
+
+
+# All models are evaluated on sub256 with CoT (nucleus, T=0.6, p=0.95).
+# vLLM runs contributed by supervisor; 10 seeds each unless noted.
 MODELS = {
-    "DeepSeek-8B": {
-        "pattern": "deepseek_8b_cot1024_sub64_v2_seed{seed}_predictions.jsonl",
-        "seeds": [0, 1, 2, 3, 4],
-    },
     "Mistral-7B": {
-        "pattern": "mistral_7b_cot_sub256_v2_seed{seed}_predictions.jsonl",
-        "seeds": [0, 1, 3, 4],
+        "files": _vllm_files(
+            "mistral7b_vllm",
+            "mistral_7b_cot_sub256_vllm_predictions_sample",
+            range(10),
+        ),
+    },
+    "Llama-3.1-8B": {
+        "files": _vllm_files(
+            "llama8b_vllm",
+            "llama31_8b_sub256_predictions_sample",
+            range(10),
+        ),
+    },
+    "OLMo-2-13B": {
+        "files": _vllm_files(
+            "olmo2_13b_vllm",
+            "olmo2_13b_sub256_predictions_sample",
+            range(10),
+        ),
+    },
+    "DeepSeek-R1-Distill-Llama-8B": {
+        "files": _vllm_files(
+            "deepseek_llama_8b_vllm",
+            "vllm_Deepseek_256_predictions_sample",
+            range(10),
+        ),
+    },
+    "DeepSeek-R1-Distill-Qwen-14B": {
+        "files": _vllm_files(
+            "deepseek_qwen_14b_vllm",
+            "deepseek14b_sub256_predictions_sample",
+            range(10),
+        ),
+    },
+    "Mistral-Small-24B": {
+        # Two runs of 5 seeds each (supervisor split job).
+        "files": _vllm_files(
+            "mistral24B_vllm",
+            "mistral24b_vllm_1_predictions_sample",
+            range(5),
+        ) + _vllm_files(
+            "mistral24B_vllm",
+            "mistral24b_vllm_2_predictions_sample",
+            range(5),
+        ),
     },
 }
 
@@ -133,14 +179,14 @@ def main():
 
     for model, cfg in MODELS.items():
         per_model[model] = []
-        for seed in cfg["seeds"]:
-            path = PRED_DIR / cfg["pattern"].format(seed=seed)
+        for idx, rel_path in enumerate(cfg["files"]):
+            path = PRED_DIR / rel_path
             if not path.exists():
                 print(f"[skip] {path} not found")
                 continue
             metrics = score_seed(path, gold)
             metrics["model"] = model
-            metrics["seed"] = seed
+            metrics["seed"] = idx
             per_seed_rows.append(metrics)
             per_model[model].append(metrics)
 

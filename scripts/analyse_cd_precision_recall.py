@@ -39,14 +39,57 @@ GOLD_FILE = Path("data/processed/dataset_all_forms.jsonl")
 PRED_DIR = Path("data/predictions")
 OUTPUT_DIR = Path("outputs/report")
 
+def _vllm_files(subdir, prefix, seeds):
+    return [f"vllm/{subdir}/{prefix}{s}.jsonl" for s in seeds]
+
+
+# All models: sub256, CoT, nucleus (T=0.6, p=0.95), 10 seeds via vLLM (supervisor runs).
 MODELS = {
-    "DeepSeek-8B": {
-        "pattern": "deepseek_8b_cot1024_sub64_v2_seed{seed}_predictions.jsonl",
-        "seeds": [0, 1, 2, 3, 4],
-    },
     "Mistral-7B": {
-        "pattern": "mistral_7b_cot_sub256_v2_seed{seed}_predictions.jsonl",
-        "seeds": [0, 1, 3, 4],
+        "files": _vllm_files(
+            "mistral7b_vllm",
+            "mistral_7b_cot_sub256_vllm_predictions_sample",
+            range(10),
+        ),
+    },
+    "Llama-3.1-8B": {
+        "files": _vllm_files(
+            "llama8b_vllm",
+            "llama31_8b_sub256_predictions_sample",
+            range(10),
+        ),
+    },
+    "OLMo-2-13B": {
+        "files": _vllm_files(
+            "olmo2_13b_vllm",
+            "olmo2_13b_sub256_predictions_sample",
+            range(10),
+        ),
+    },
+    "DeepSeek-R1-Distill-Llama-8B": {
+        "files": _vllm_files(
+            "deepseek_llama_8b_vllm",
+            "vllm_Deepseek_256_predictions_sample",
+            range(10),
+        ),
+    },
+    "DeepSeek-R1-Distill-Qwen-14B": {
+        "files": _vllm_files(
+            "deepseek_qwen_14b_vllm",
+            "deepseek14b_sub256_predictions_sample",
+            range(10),
+        ),
+    },
+    "Mistral-Small-24B": {
+        "files": _vllm_files(
+            "mistral24B_vllm",
+            "mistral24b_vllm_1_predictions_sample",
+            range(5),
+        ) + _vllm_files(
+            "mistral24B_vllm",
+            "mistral24b_vllm_2_predictions_sample",
+            range(5),
+        ),
     },
 }
 
@@ -189,7 +232,7 @@ def main():
     print("=== Gold-label distribution per framework (role=none) ===\n")
     gold_rows = []
     for model, cfg in MODELS.items():
-        first_seed_path = PRED_DIR / cfg["pattern"].format(seed=cfg["seeds"][0])
+        first_seed_path = PRED_DIR / cfg["files"][0]
         if not first_seed_path.exists():
             continue
         preds = load_preds(first_seed_path)
@@ -216,9 +259,10 @@ def main():
     per_model = {}
     for model, cfg in MODELS.items():
         per_model[model] = []
-        for seed in cfg["seeds"]:
-            path = PRED_DIR / cfg["pattern"].format(seed=seed)
+        for rel_path in cfg["files"]:
+            path = PRED_DIR / rel_path
             if not path.exists():
+                print(f"[skip] {path} not found")
                 continue
             per_model[model].append(score_seed(path, gold))
 
@@ -288,14 +332,14 @@ def main():
             "the model answers `Cannot determine'. Values are mean $\\pm$ "
             "std across sampling seeds (nucleus, $T=0.6$, $p=0.95$).}\n"
             "\\label{tab:cannot-determine-analysis}\n"
-            "\\begin{tabular}{lrrrrr}\n"
+            "\\begin{tabular}{lrrrr}\n"
             "\\toprule\n"
-            "Model & $N$ & Overall CD (\\%) & Precision (\\%) & Recall (\\%) & F1 (\\%) \\\\\n"
+            "Model & Overall CD (\\%) & Precision (\\%) & Recall (\\%) & F1 (\\%) \\\\\n"
             "\\midrule\n"
         )
         for r in csv_rows:
             f.write(
-                f"{r['model']} & {r['n_overall']} & "
+                f"{r['model']} & "
                 f"{fmt(r['model_NVC_pct_mean'], r['model_NVC_pct_std'])} & "
                 f"{fmt(r['nvc_precision_pct_mean'], r['nvc_precision_pct_std'])} & "
                 f"{fmt(r['nvc_recall_pct_mean'], r['nvc_recall_pct_std'])} & "
@@ -307,36 +351,43 @@ def main():
     # Bucket table: Cannot-determine rate by (classical C, WCS C) status
     bucket_tex = OUTPUT_DIR / "cd_analysis_frameworks.tex"
     with open(bucket_tex, "w", encoding="utf-8") as f:
+        # All models are evaluated on the same sub256 subset, so bucket sizes
+        # are identical across models. Report them once in the caption.
+        first = csv_rows[0]
+        n_both = first["n_both"]
+        n_only_cls = first["n_only_cls"]
+        n_only_wcs = first["n_only_wcs"]
+        n_neither = first["n_neither"]
+
         f.write(
-            "\\begin{table}[htbp]\n"
-            "\\caption{Model `Cannot determine' rate on (item, conclusion) "
-            "pairs, grouped by whether each framework assigns C (Cannot "
-            "determine) as the gold label. ``Both'' = both frameworks say C; "
-            "``Only Cls.'' = only Classical Logic; ``Only WCS'' = only WCS; "
-            "``Neither'' = neither framework says C. Values are mean $\\pm$ "
-            "std across sampling seeds.}\n"
-            "\\label{tab:cannot-determine-buckets}\n"
-            "\\begin{tabular}{lrrrrr}\n"
+            "\\begin{table}[H]\n"
+            "\\begin{tabular}{lrrrr}\n"
             "\\toprule\n"
-            "Model & Bucket & $n$ & CD rate (\\%) & & \\\\\n"
+            "Model & Both & Classical only & WCS only & Neither \\\\\n"
             "\\midrule\n"
         )
         for r in csv_rows:
-            for b, label in [
-                ("both", "Both"),
-                ("only_cls", "Only Cls."),
-                ("only_wcs", "Only WCS"),
-                ("neither", "Neither"),
-            ]:
-                f.write(
-                    f"{r['model'] if b == 'both' else ''} & {label} & "
-                    f"{r[f'n_{b}']} & "
-                    f"{fmt(r[f'nvc_rate_{b}_pct_mean'], r[f'nvc_rate_{b}_pct_std'])} & & \\\\\n"
-                )
-            f.write("\\midrule\n")
-        # strip trailing \midrule
-        pass
-        f.write("\\bottomrule\n\\end{tabular}\n\\end{table}\n")
+            f.write(
+                f"{r['model']} & "
+                f"{fmt(r['nvc_rate_both_pct_mean'], r['nvc_rate_both_pct_std'])} & "
+                f"{fmt(r['nvc_rate_only_cls_pct_mean'], r['nvc_rate_only_cls_pct_std'])} & "
+                f"{fmt(r['nvc_rate_only_wcs_pct_mean'], r['nvc_rate_only_wcs_pct_std'])} & "
+                f"{fmt(r['nvc_rate_neither_pct_mean'], r['nvc_rate_neither_pct_std'])} \\\\\n"
+            )
+        f.write(
+            "\\bottomrule\n"
+            "\\end{tabular}\n"
+            "\\caption{Model \\emph{Cannot determine} rate (\\%) on "
+            "(item, conclusion) pairs, grouped by whether each framework "
+            "assigns C (Cannot determine) as the gold label. ``Both'' = both "
+            "frameworks say C; ``Classical only'' = only Classical Logic; "
+            "``WCS only'' = only WCS; ``Neither'' = neither framework says "
+            f"C. Bucket sizes: $n = {n_both}$ (Both), ${n_only_cls}$ "
+            f"(Classical only), ${n_only_wcs}$ (WCS only), ${n_neither}$ "
+            "(Neither). Values are mean $\\pm$ std across sampling seeds.}\n"
+            "\\label{tab:cannot-determine-per-frameworks}\n"
+            "\\end{table}\n"
+        )
     print(f"Wrote {bucket_tex}")
 
     # Gold distribution table

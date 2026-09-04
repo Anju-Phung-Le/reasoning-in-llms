@@ -1,3 +1,7 @@
 model,n_overall,gold_classical_A_pct,gold_classical_B_pct,gold_classical_NVC_pct,gold_wcs_A_pct,gold_wcs_B_pct,gold_wcs_NVC_pct
-DeepSeek-8B,88,4.55,4.55,90.91,4.55,4.55,90.91
 Mistral-7B,512,5.66,5.66,88.67,7.42,8.01,84.57
+Llama-3.1-8B,512,5.66,5.66,88.67,7.42,8.01,84.57
+OLMo-2-13B,512,5.66,5.66,88.67,7.42,8.01,84.57
+DeepSeek-R1-Distill-Llama-8B,512,5.66,5.66,88.67,7.42,8.01,84.57
+DeepSeek-R1-Distill-Qwen-14B,512,5.66,5.66,88.67,7.42,8.01,84.57
+Mistral-Small-24B,512,5.66,5.66,88.67,7.42,8.01,84.57
