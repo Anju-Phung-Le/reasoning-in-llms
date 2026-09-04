@@ -13,16 +13,16 @@ GOLD_FILE = Path("data/processed/dataset_all_forms.jsonl")
 
 MODEL_FILES = {
     "Flan-T5 Small": Path(
-        "data/predictions/flan_t5_small4_all_forms_predictions.jsonl"
+        "data/predictions/all_forms/flan_t5_small4_all_forms_predictions.jsonl"
     ),
     "Flan-T5 Base": Path(
-        "data/predictions/flan_t5_base3_all_forms_predictions.jsonl"
+        "data/predictions/all_forms/flan_t5_base3_all_forms_predictions.jsonl"
     ),
     "Flan-T5 Large": Path(
-        "data/predictions/flan_t5_large3_all_forms_predictions.jsonl"
+        "data/predictions/all_forms/flan_t5_large3_all_forms_predictions.jsonl"
     ),
     "Mistral-7B": Path(
-        "data/predictions/mistral_7b_all_forms_predictions.jsonl"
+        "data/predictions/all_forms/mistral_7b_all_forms_predictions.jsonl"
     ),
     # DeepSeek-R1-Distill-Llama-8B is excluded from the no-CoT table:
     # its chat template prepends <think>, so a forced next-token argmax
