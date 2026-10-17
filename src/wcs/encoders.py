@@ -2,7 +2,7 @@ from .program import Program
 from .tv import TV, l_and, l_not
 
 
-# Rules of bodies, mainly section 2 TODO: check other sections
+# Rules of bodies, mainly section 2 
 def atom(pred: str, obj: str):
     return lambda I: I.get(pred, obj)
 

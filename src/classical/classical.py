@@ -89,6 +89,7 @@ def all_satisfying_models(form):
     satisfying = []
     for model in all_models():
         premise1_holds = _premise_holds(model, mood1, y1, z1)
+
         premise2_holds = _premise_holds(model, mood2, y2, z2)
         # a_nonempty = any(t[ai] == 1 for t in model)
         # b_nonempty = any(t[bi] == 1 for t in model)

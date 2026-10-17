@@ -564,3 +564,5 @@ def _run_chunk(llm, tok, items, fouts, flogs, cot, thinking, reasoning_prompt,
     prompt_ordinal += len(refs)
     print(f"[progress] {n_preds} predictions written", flush=True)
     return n_preds, prompt_ordinal
+
+
