@@ -1,0 +1,44 @@
+\begin{table}[htbp]
+\centering
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\caption{Net WCS-versus-Classical alignment on disagreement questions pooled across all four role conditions (none, child, teen, adult), by syllogistic form. The 27 forms shown are those with disagreements among the 64 possible forms. Entries are percentage-point differences: WCS-only response rate minus Classical-only response rate.}
+\label{tab:alignment-by-syllogistic-form}
+\begin{tabular}{lrrrrrrr}
+\toprule
+Form & $n$ & Llama-8B & DS-Llama & DS-Qwen & Mistral-7B & Mistral-24B & OLMo-13B \\
+\midrule
+AA1 & 8 & +83.8 & +100.0 & +100.0 & +100.0 & +100.0 & +100.0 \\
+AA2 & 20 & +90.0 & +95.5 & +99.0 & +98.5 & +100.0 & +91.5 \\
+AA4 & 40 & +76.2 & +78.2 & +37.8 & +50.5 & +64.0 & +70.5 \\
+AE1 & 28 & -54.6 & -98.6 & -100.0 & -87.9 & -100.0 & -44.6 \\
+AE2 & 3 & +50.0 & +40.0 & +6.7 & -6.7 & +80.0 & +73.3 \\
+AE3 & 4 & -30.0 & -95.0 & -100.0 & -72.5 & -100.0 & -50.0 \\
+AE4 & 12 & +71.7 & +74.2 & +60.8 & -15.0 & +66.7 & +75.8 \\
+AI4 & 14 & -30.0 & -26.4 & -72.9 & +2.9 & -51.4 & +0.0 \\
+AO2 & 12 & +47.5 & +13.3 & -18.3 & +59.2 & +36.7 & +98.3 \\
+AO3 & 8 & -58.8 & -92.5 & -92.5 & -55.0 & -95.0 & -73.8 \\
+EA1 & 6 & -18.3 & -71.7 & -96.7 & +10.0 & -86.7 & +60.0 \\
+EA2 & 16 & -36.2 & -81.2 & -100.0 & -71.9 & -93.8 & -65.6 \\
+EA3 & 16 & -17.5 & -73.8 & -100.0 & +15.0 & -97.5 & -50.0 \\
+EA4 & 14 & +77.9 & +85.7 & +84.3 & +55.0 & +31.4 & +95.7 \\
+EI1 & 20 & -30.5 & -42.0 & -85.0 & -15.0 & -42.5 & -0.5 \\
+EI2 & 14 & -70.0 & -75.7 & -65.7 & -62.9 & -48.6 & -100.0 \\
+EI3 & 10 & -54.0 & -90.0 & -84.0 & -60.0 & -68.0 & -90.0 \\
+EI4 & 6 & -38.3 & -86.7 & -76.7 & -66.7 & +0.0 & -93.3 \\
+IA4 & 14 & +87.9 & +71.4 & +34.3 & +100.0 & +62.9 & +88.6 \\
+IE1 & 16 & -31.2 & -55.0 & -38.8 & -96.2 & -5.0 & -75.6 \\
+IE2 & 20 & +10.0 & -0.5 & -4.0 & -32.5 & +26.0 & +10.0 \\
+IE3 & 14 & -38.6 & -42.9 & -78.6 & -38.6 & -17.1 & -88.6 \\
+IE4 & 4 & -82.5 & -97.5 & -90.0 & -90.0 & +10.0 & -70.0 \\
+IO2 & 4 & +57.5 & +90.0 & +75.0 & +50.0 & +10.0 & +60.0 \\
+OA1 & 6 & +35.0 & -71.7 & -100.0 & +33.3 & -80.0 & +40.0 \\
+OA3 & 8 & -52.5 & -83.8 & -92.5 & -50.0 & -30.0 & -53.8 \\
+OI1 & 12 & -10.8 & +15.8 & -90.0 & +19.2 & -100.0 & -10.0 \\
+\bottomrule
+\end{tabular}
+\vspace{2pt}
+\begin{minipage}{\linewidth}
+\scriptsize $n$ is the number of unique disagreement prompts in that form pooled across all four roles. The 349 prompts comprise 69 none, 86 child, 102 teen, and 92 adult prompts; the neutral-role subset alone has $n=69$. Each prompt has 10 generated responses per model. The denominator for each difference includes WCS-only, Classical-only, neither, and invalid responses; positive values lean WCS, negative values lean Classical.
+\end{minipage}
+\end{table}
