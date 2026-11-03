@@ -126,5 +126,3 @@ def entailed_set_for_form(form: str, domain=None) -> Set[str]:
     P, dom = build_program_for_form(form)
     result = run_wcs_program(P, domain=dom if domain is None else domain)
     return result.entailed_labels()
-
-# TODO: use these results to generate dataset for all 64 forms. 

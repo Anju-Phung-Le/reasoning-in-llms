@@ -148,17 +148,20 @@ def score_seed(pred_path, gold):
     def pct(n, d):
         return 100.0 * n / d if d else 0.0
 
+    classical_pct = pct(dis["classical"], dis_total)
+    wcs_pct = pct(dis["wcs"], dis_total)
     return {
         "n_overall": overall_total,
         "overall_A_pct": pct(overall.get(0, 0), overall_total),
         "overall_B_pct": pct(overall.get(1, 0), overall_total),
         "overall_C_pct": pct(overall.get(2, 0), overall_total),
         "n_disagreement": dis_total,
-        "classical_match_pct": pct(dis["classical"], dis_total),
-        "wcs_match_pct": pct(dis["wcs"], dis_total),
+        "classical_match_pct": classical_pct,
+        "wcs_match_pct": wcs_pct,
         "neither_pct": pct(dis["neither"], dis_total),
         "unparsed_pct": pct(dis["unparsed"], dis_total),
         "disagreement_nvc_pct": pct(dis_nvc, dis_total),
+        "delta": wcs_pct - classical_pct,
     }
 
 
@@ -337,6 +340,73 @@ def main():
             )
         f.write("\\bottomrule\n\\end{tabular}\n\\end{table}\n")
     print(f"Wrote {tex_path}")
+
+    # ---------------- final combined table ----------------
+    final_model_order = [
+        "Flan-T5 Small",
+        "Flan-T5 Base",
+        "Flan-T5 Large",
+        "Mistral-7B",
+        "Llama-3.1-8B",
+        "OLMo-2-13B",
+        "DeepSeek-R1-Distill-Llama-8B",
+        "DeepSeek-R1-Distill-Qwen-14B",
+        "Mistral-Small-24B",
+    ]
+    final_model_paths = {
+        "Flan-T5 Small": ["all_forms/flan_t5_small4_all_forms_predictions.jsonl"],
+        "Flan-T5 Base": ["all_forms/flan_t5_base3_all_forms_predictions.jsonl"],
+        "Flan-T5 Large": ["all_forms/flan_t5_large3_all_forms_predictions.jsonl"],
+        "Mistral-7B": [f"vllm/mistral7b_vllm/mistral_7b_cot_sub256_vllm_predictions_sample{i}.jsonl" for i in range(10)],
+        "Llama-3.1-8B": [f"vllm/llama8b_vllm/llama31_8b_sub256_predictions_sample{i}.jsonl" for i in range(10)],
+        "OLMo-2-13B": [f"vllm/olmo2_13b_vllm/olmo2_13b_sub256_predictions_sample{i}.jsonl" for i in range(10)],
+        "DeepSeek-R1-Distill-Llama-8B": [f"vllm/deepseek_llama_8b_vllm/vllm_Deepseek_256_predictions_sample{i}.jsonl" for i in range(10)],
+        "DeepSeek-R1-Distill-Qwen-14B": [f"vllm/deepseek_qwen_14b_vllm/deepseek14b_sub256_predictions_sample{i}.jsonl" for i in range(10)],
+        "Mistral-Small-24B": [
+            *[f"vllm/mistral24B_vllm/mistral24b_vllm_1_predictions_sample{i}.jsonl" for i in range(5)],
+            *[f"vllm/mistral24B_vllm/mistral24b_vllm_2_predictions_sample{i}.jsonl" for i in range(5)],
+        ],
+    }
+
+    final_tex_path = OUTPUT_DIR / "disagreement_none_final.tex"
+    with open(final_tex_path, "w", encoding="utf-8") as final_file:
+        final_file.write(
+            "\\begin{table}[htbp]\n"
+            "\\caption{Model responses on question instances where Classical Logic and Weak Completion Semantics (WCS) assign different gold labels in the neutral role condition. $\\Delta$ denotes the WCS match rate minus the Classical match rate.}\n"
+            "\\label{tab:disagreement-neutral-final}\n"
+            "\\begin{tabular}{lrrrr}\n"
+            "\\toprule\n"
+            "Model & Classical (\\%) & WCS (\\%) & Neither (\\%) & $\\Delta$ \\\\\n"
+            "\\midrule\n"
+        )
+        for model_name in final_model_order:
+            rel_paths = final_model_paths.get(model_name, [])
+            rows = []
+            for rel_path in rel_paths:
+                path = PRED_DIR / rel_path
+                if path.exists():
+                    rows.append(score_seed(path, gold))
+            if not rows:
+                continue
+            if len(rows) == 1:
+                row = rows[0]
+                final_file.write(
+                    f"{model_name} & {row['classical_match_pct']:.2f} & {row['wcs_match_pct']:.2f} & {row['neither_pct']:.2f} & {row['delta']:+.2f} \\\\\n"
+                )
+            else:
+                c_vals = [r["classical_match_pct"] for r in rows]
+                w_vals = [r["wcs_match_pct"] for r in rows]
+                n_vals = [r["neither_pct"] for r in rows]
+                d_vals = [r["delta"] for r in rows]
+                c_mean, c_std = mean_std(c_vals)
+                w_mean, w_std = mean_std(w_vals)
+                n_mean, n_std = mean_std(n_vals)
+                d_mean, d_std = mean_std(d_vals)
+                final_file.write(
+                    f"{model_name} & {c_mean:.2f} $\\pm$ {c_std:.2f} & {w_mean:.2f} $\\pm$ {w_std:.2f} & {n_mean:.2f} $\\pm$ {n_std:.2f} & {d_mean:+.2f} $\\pm$ {d_std:.2f} \\\\\n"
+                )
+        final_file.write("\\bottomrule\n\\end{tabular}\n\\end{table}\n")
+    print(f"Wrote {final_tex_path}")
 
 
 if __name__ == "__main__":

@@ -1,0 +1,45 @@
+\begin{figure}[H]
+\centering
+\caption{Agreement rates by lexical domain for the vLLM sub256 sample under Classical Logic and WCS. Darker cells indicate higher agreement.}
+\label{fig:domain-heatmap-vllm}
+\small
+\begin{tabular}{lcccc}
+\multicolumn{5}{c}{\textbf{Classical Logic}} \\
+\toprule
+Model & Animals & Nature & Objects & People \\
+\midrule
+DeepSeek-R1-Distill-Llama-8B & \cellcolor{green!40}{44.23} & \cellcolor{green!8}{39.03} & \cellcolor{green!24}{41.58} & \cellcolor{green!90}{52.48} \\
+
+DeepSeek-R1-Distill-Qwen-14B & \cellcolor{green!22}{67.77} & \cellcolor{green!8}{64.91} & \cellcolor{green!79}{79.62} & \cellcolor{green!90}{81.80} \\
+
+Llama-3.1-8B & \cellcolor{green!8}{34.11} & \cellcolor{green!19}{35.39} & \cellcolor{green!78}{42.54} & \cellcolor{green!90}{44.02} \\
+
+Mistral-Small-24B & \cellcolor{green!58}{70.86} & \cellcolor{green!8}{60.44} & \cellcolor{green!90}{77.71} & \cellcolor{green!82}{75.98} \\
+
+Mistral-7B & \cellcolor{green!8}{20.75} & \cellcolor{green!18}{23.25} & \cellcolor{green!90}{41.56} & \cellcolor{green!83}{39.71} \\
+
+OLMo-2-13B & \cellcolor{green!14}{22.07} & \cellcolor{green!8}{21.50} & \cellcolor{green!90}{29.90} & \cellcolor{green!64}{27.19} \\
+
+\bottomrule
+\end{tabular}
+\vspace{1.0em}
+\begin{tabular}{lcccc}
+\multicolumn{5}{c}{\textbf{WCS}} \\
+\toprule
+Model & Animals & Nature & Objects & People \\
+\midrule
+DeepSeek-R1-Distill-Llama-8B & \cellcolor{blue!33}{40.75} & \cellcolor{blue!8}{34.58} & \cellcolor{blue!33}{40.65} & \cellcolor{blue!90}{54.80} \\
+
+DeepSeek-R1-Distill-Qwen-14B & \cellcolor{blue!26}{62.20} & \cellcolor{blue!8}{57.91} & \cellcolor{blue!86}{76.65} & \cellcolor{blue!90}{77.50} \\
+
+Llama-3.1-8B & \cellcolor{blue!8}{33.57} & \cellcolor{blue!16}{34.95} & \cellcolor{blue!71}{44.48} & \cellcolor{blue!90}{47.83} \\
+
+Mistral-Small-24B & \cellcolor{blue!47}{66.68} & \cellcolor{blue!8}{57.31} & \cellcolor{blue!90}{76.67} & \cellcolor{blue!90}{76.78} \\
+
+Mistral-7B & \cellcolor{blue!8}{16.09} & \cellcolor{blue!23}{21.25} & \cellcolor{blue!90}{43.77} & \cellcolor{blue!82}{41.15} \\
+
+OLMo-2-13B & \cellcolor{blue!8}{19.48} & \cellcolor{blue!19}{21.19} & \cellcolor{blue!90}{32.08} & \cellcolor{blue!80}{30.53} \\
+
+\bottomrule
+\end{tabular}
+\end{figure}
