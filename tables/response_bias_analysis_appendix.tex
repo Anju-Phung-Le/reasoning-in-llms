@@ -1,0 +1,61 @@
+\begin{table}[htbp]
+\centering
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\caption{Observed alignment compared with a response-frequency baseline. For each model run, predictions were shuffled 5,000 times across the same 69 questions, preserving the model's Yes/No/CD/Invalid frequencies. Positive excess indicates alignment above that baseline.}
+\label{tab:response-bias-alignment}
+\textbf{Classical alignment}
+\begin{tabular}{lrrr}
+\toprule
+Model & Observed (\%) & Shuffled base (\%) & Excess (pp) \\
+\midrule
+Flan-T5 Small & 17.39\% & 17.39\% & 0.00 pp \\
+Flan-T5 Base & 24.64\% & 18.08\% & 6.55 pp \\
+Flan-T5 Large & 30.43\% & 18.08\% & 12.35 pp \\
+Mistral-7B & 36.09 $\pm$ 2.77\% & 24.98 $\pm$ 1.40\% & 11.10 $\pm$ 2.51 pp \\
+Llama-3.1-8B & 39.86 $\pm$ 3.82\% & 27.62 $\pm$ 2.31\% & 12.23 $\pm$ 4.15 pp \\
+OLMo-2-13B & 36.52 $\pm$ 1.91\% & 22.94 $\pm$ 2.09\% & 13.59 $\pm$ 1.82 pp \\
+DeepSeek-Llama-8B & 53.33 $\pm$ 3.60\% & 29.38 $\pm$ 2.17\% & 23.95 $\pm$ 2.70 pp \\
+DeepSeek-Qwen-14B & 64.49 $\pm$ 4.17\% & 35.90 $\pm$ 1.22\% & 28.59 $\pm$ 3.63 pp \\
+Mistral-Small-24B & 56.81 $\pm$ 1.91\% & 38.60 $\pm$ 0.99\% & 18.21 $\pm$ 2.11 pp \\
+\bottomrule
+\end{tabular}
+\vspace{4pt}
+\textbf{WCS alignment}
+\begin{tabular}{lrrr}
+\toprule
+Model & Observed (\%) & Shuffled base (\%) & Excess (pp) \\
+\midrule
+Flan-T5 Small & 34.78\% & 34.78\% & 0.00 pp \\
+Flan-T5 Base & 52.17\% & 33.71\% & 18.46 pp \\
+Flan-T5 Large & 46.38\% & 33.52\% & 12.85 pp \\
+Mistral-7B & 45.80 $\pm$ 2.39\% & 32.22 $\pm$ 0.29\% & 13.58 $\pm$ 2.46 pp \\
+Llama-3.1-8B & 51.88 $\pm$ 3.79\% & 32.31 $\pm$ 0.59\% & 19.57 $\pm$ 3.58 pp \\
+OLMo-2-13B & 43.62 $\pm$ 3.01\% & 33.28 $\pm$ 0.15\% & 10.34 $\pm$ 3.00 pp \\
+DeepSeek-Llama-8B & 40.87 $\pm$ 2.80\% & 33.02 $\pm$ 0.13\% & 7.84 $\pm$ 2.84 pp \\
+DeepSeek-Qwen-14B & 33.77 $\pm$ 3.99\% & 33.31 $\pm$ 0.08\% & 0.45 $\pm$ 4.03 pp \\
+Mistral-Small-24B & 42.32 $\pm$ 2.25\% & 33.41 $\pm$ 0.07\% & 8.91 $\pm$ 2.26 pp \\
+\bottomrule
+\end{tabular}
+\vspace{4pt}
+\textbf{WCS-minus-Classical difference ($\Delta$)}
+\begin{tabular}{lrrr}
+\toprule
+Model & Observed $\Delta$ & Shuffled expected $\Delta$ & Excess $\Delta$ \\
+\midrule
+Flan-T5 Small & 17.39 pp & 17.39 pp & 0.00 pp \\
+Flan-T5 Base & 27.54 pp & 15.63 pp & 11.91 pp \\
+Flan-T5 Large & 15.94 pp & 15.44 pp & 0.50 pp \\
+Mistral-7B & 9.71 $\pm$ 4.48 pp & 7.23 $\pm$ 1.32 pp & 2.48 $\pm$ 4.51 pp \\
+Llama-3.1-8B & 12.03 $\pm$ 7.13 pp & 4.69 $\pm$ 2.06 pp & 7.34 $\pm$ 7.29 pp \\
+OLMo-2-13B & 7.10 $\pm$ 4.24 pp & 10.35 $\pm$ 2.12 pp & -3.25 $\pm$ 4.27 pp \\
+DeepSeek-Llama-8B & -12.46 $\pm$ 6.19 pp & 3.64 $\pm$ 2.07 pp & -16.11 $\pm$ 5.31 pp \\
+DeepSeek-Qwen-14B & -30.72 $\pm$ 8.05 pp & -2.58 $\pm$ 1.19 pp & -28.14 $\pm$ 7.45 pp \\
+Mistral-Small-24B & -14.49 $\pm$ 4.10 pp & -5.19 $\pm$ 0.94 pp & -9.30 $\pm$ 4.19 pp \\
+\bottomrule
+\end{tabular}
+\vspace{2pt}
+\begin{minipage}{\linewidth}
+\scriptsize Base is the exact expected match rate under a uniform random permutation of the fixed answer multiset; 5,000 actual shuffles estimate the corresponding null SD and check the expectation. Excess = observed minus shuffled expectation. Percentages use all 69 questions. For vLLM, $\pm$ is the SD across ten generations; for FLAN-T5, outputs are deterministic. This baseline controls only answer frequencies, not question difficulty or dependencies among conclusions.
+\end{minipage}
+\end{table}

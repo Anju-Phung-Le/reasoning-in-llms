@@ -205,6 +205,17 @@ def score_seed(pred_path, gold):
         metrics[f"nvc_rate_{b}_pct"] = pct(bucket_nvc[b], bucket_total[b])
         metrics[f"n_{b}"] = bucket_total[b]
 
+    n_classical_cd_gold = bucket_total["both"] + bucket_total["only_cls"]
+    n_wcs_cd_gold = bucket_total["both"] + bucket_total["only_wcs"]
+    metrics["n_classical_cd_gold"] = n_classical_cd_gold
+    metrics["n_wcs_cd_gold"] = n_wcs_cd_gold
+    metrics["nvc_rate_classical_cd_gold_pct"] = pct(
+        bucket_nvc["both"] + bucket_nvc["only_cls"], n_classical_cd_gold
+    )
+    metrics["nvc_rate_wcs_cd_gold_pct"] = pct(
+        bucket_nvc["both"] + bucket_nvc["only_wcs"], n_wcs_cd_gold
+    )
+
     metrics["nvc_precision_pct"] = pct(tp, tp + fp)
     metrics["nvc_recall_pct"] = pct(tp, tp + fn)
     f1_denom = (metrics["nvc_precision_pct"] + metrics["nvc_recall_pct"])
@@ -272,122 +283,107 @@ def main():
         "model_A_pct", "model_B_pct", "model_NVC_pct",
         "nvc_rate_both_pct", "nvc_rate_only_cls_pct",
         "nvc_rate_only_wcs_pct", "nvc_rate_neither_pct",
+        "nvc_rate_classical_cd_gold_pct", "nvc_rate_wcs_cd_gold_pct",
         "nvc_precision_pct", "nvc_recall_pct", "nvc_f1_pct",
     ]
 
+    # Print summary and write CSV.
+    print("=== Model NVC analysis (mean +/- std across seeds) ===\n")
+    metric_keys = [
+        "model_A_pct", "model_B_pct", "model_NVC_pct",
+        "nvc_rate_both_pct", "nvc_rate_only_cls_pct",
+        "nvc_rate_only_wcs_pct", "nvc_rate_neither_pct",
+        "nvc_rate_classical_cd_gold_pct", "nvc_rate_wcs_cd_gold_pct",
+        "nvc_precision_pct", "nvc_recall_pct", "nvc_f1_pct",
+    ]
     csv_rows = []
     for model, rows in per_model.items():
         if not rows:
             continue
-        r0 = rows[0]
-        print(f"{model}  (n_seeds={len(rows)}, n_overall={r0['n_overall']})")
-        print(f"  bucket sizes: both={r0['n_both']}  only_cls={r0['n_only_cls']}  "
-              f"only_wcs={r0['n_only_wcs']}  neither={r0['n_neither']}")
-        out_row = {"model": model, "n_seeds": len(rows), "n_overall": r0["n_overall"]}
-        for b in ("both", "only_cls", "only_wcs", "neither"):
-            out_row[f"n_{b}"] = r0[f"n_{b}"]
-        for k in metric_keys:
-            m, s = mean_std([r[k] for r in rows])
-            print(f"  {k:<26}: {m:6.2f} +/- {s:.2f}")
-            out_row[f"{k}_mean"] = round(m, 2)
-            out_row[f"{k}_std"] = round(s, 2)
-        print()
+        first = rows[0]
+        print(f"{model} (n_seeds={len(rows)}, n_overall={first['n_overall']})")
+        out_row = {"model": model, "n_seeds": len(rows), "n_overall": first["n_overall"]}
+        for key in ("both", "only_cls", "only_wcs", "neither", "classical_cd_gold", "wcs_cd_gold"):
+            out_row[f"n_{key}"] = first[f"n_{key}"]
+        for key in metric_keys:
+            mean, sd = mean_std([row[key] for row in rows])
+            out_row[f"{key}_mean"] = round(mean, 2)
+            out_row[f"{key}_std"] = round(sd, 2)
         csv_rows.append(out_row)
 
-    # Write CSVs
     if gold_rows:
-        gold_path = OUTPUT_DIR / "cd_gold_distribution.csv"
-        with open(gold_path, "w", newline="", encoding="utf-8") as f:
-            w = csv.DictWriter(f, fieldnames=list(gold_rows[0].keys()))
-            w.writeheader()
-            w.writerows(gold_rows)
-        print(f"Wrote {gold_path}")
-
+        with (OUTPUT_DIR / "cd_gold_distribution.csv").open("w", newline="", encoding="utf-8") as output:
+            writer = csv.DictWriter(output, fieldnames=list(gold_rows[0]))
+            writer.writeheader()
+            writer.writerows(gold_rows)
     if csv_rows:
-        analysis_path = OUTPUT_DIR / "cd_analysis_summary.csv"
-        with open(analysis_path, "w", newline="", encoding="utf-8") as f:
-            w = csv.DictWriter(f, fieldnames=list(csv_rows[0].keys()))
-            w.writeheader()
-            w.writerows(csv_rows)
-        print(f"Wrote {analysis_path}")
+        with (OUTPUT_DIR / "cd_analysis_summary.csv").open("w", newline="", encoding="utf-8") as output:
+            writer = csv.DictWriter(output, fieldnames=list(csv_rows[0]))
+            writer.writeheader()
+            writer.writerows(csv_rows)
 
-    # ---------------------------------------------------------------
-    # LaTeX tables
-    # ---------------------------------------------------------------
-    def fmt(m, s):
-        return f"{m:.2f} $\\pm$ {s:.2f}"
+    def fmt(mean, sd):
+        return f"{mean:.2f} $\\pm$ {sd:.2f}"
 
-    # Main table: precision / recall / F1 + overall Cannot-determine rate
     main_tex = OUTPUT_DIR / "cd_analysis_main.tex"
-    with open(main_tex, "w", encoding="utf-8") as f:
-        f.write(
+    with main_tex.open("w", encoding="utf-8") as output:
+        output.write(
             "\\begin{table}[htbp]\n"
-            "\\caption{Model use of the \\emph{Cannot determine} response "
-            "(option C) on seeded CoT runs. Note that this measures the "
-            "per-conclusion `Cannot determine' answer, not syllogism-level "
-            "NVC in the sense of Weak Completion Semantics. Precision is the "
-            "fraction of `Cannot determine' answers where at least one "
-            "framework (Classical Logic or WCS) assigns C as the gold label. "
-            "Recall is the fraction of items with at least one C gold where "
-            "the model answers `Cannot determine'. Values are mean $\\pm$ "
-            "std across sampling seeds (nucleus, $T=0.6$, $p=0.95$).}\n"
+            "\\caption{Model use of the \\emph{Cannot determine} response (option C). Precision, recall and F1 use the combined either-framework gold definition. Values are mean $\\pm$ standard deviation across sampling seeds.}\n"
             "\\label{tab:cannot-determine-analysis}\n"
-            "\\begin{tabular}{lrrrr}\n"
-            "\\toprule\n"
-            "Model & Overall CD (\\%) & Precision (\\%) & Recall (\\%) & F1 (\\%) \\\\\n"
-            "\\midrule\n"
+            "\\begin{tabular}{lrrrr}\n\\toprule\n"
+            "Model & Overall CD (\\%) & Precision (\\%) & Recall (\\%) & F1 (\\%) \\\\\n\\midrule\n"
         )
-        for r in csv_rows:
-            f.write(
-                f"{r['model']} & "
-                f"{fmt(r['model_NVC_pct_mean'], r['model_NVC_pct_std'])} & "
-                f"{fmt(r['nvc_precision_pct_mean'], r['nvc_precision_pct_std'])} & "
-                f"{fmt(r['nvc_recall_pct_mean'], r['nvc_recall_pct_std'])} & "
-                f"{fmt(r['nvc_f1_pct_mean'], r['nvc_f1_pct_std'])} \\\\\n"
+        for row in csv_rows:
+            output.write(
+                f"{row['model']} & {fmt(row['model_NVC_pct_mean'], row['model_NVC_pct_std'])} & "
+                f"{fmt(row['nvc_precision_pct_mean'], row['nvc_precision_pct_std'])} & "
+                f"{fmt(row['nvc_recall_pct_mean'], row['nvc_recall_pct_std'])} & "
+                f"{fmt(row['nvc_f1_pct_mean'], row['nvc_f1_pct_std'])} \\\\\n"
             )
-        f.write("\\bottomrule\n\\end{tabular}\n\\end{table}\n")
-    print(f"Wrote {main_tex}")
+        output.write("\\bottomrule\n\\end{tabular}\n\\end{table}\n")
 
-    # Bucket table: Cannot-determine rate by (classical C, WCS C) status
     bucket_tex = OUTPUT_DIR / "cd_analysis_frameworks.tex"
-    with open(bucket_tex, "w", encoding="utf-8") as f:
-        # All models are evaluated on the same sub256 subset, so bucket sizes
-        # are identical across models. Report them once in the caption.
-        first = csv_rows[0]
-        n_both = first["n_both"]
-        n_only_cls = first["n_only_cls"]
-        n_only_wcs = first["n_only_wcs"]
-        n_neither = first["n_neither"]
-
-        f.write(
-            "\\begin{table}[H]\n"
-            "\\begin{tabular}{lrrrr}\n"
-            "\\toprule\n"
-            "Model & Both & Classical only & WCS only & Neither \\\\\n"
-            "\\midrule\n"
+    first = csv_rows[0]
+    n_both = first["n_both"]
+    n_only_cls = first["n_only_cls"]
+    n_only_wcs = first["n_only_wcs"]
+    n_neither = first["n_neither"]
+    n_classical_cd_gold = first["n_classical_cd_gold"]
+    n_wcs_cd_gold = first["n_wcs_cd_gold"]
+    with bucket_tex.open("w", encoding="utf-8") as output:
+        output.write(
+            "\\begin{table}[H]\n\\centering\n\\scriptsize\n"
+            "\\setlength{\\tabcolsep}{3pt}\n"
+            "\\textbf{Panel A: CD response rate by gold-label category}\\\\\n"
+            "\\begin{tabular}{lrrrr}\n\\toprule\n"
+            "Model & Both & Classical only & WCS only & Neither \\\\\n\\midrule\n"
         )
-        for r in csv_rows:
-            f.write(
-                f"{r['model']} & "
-                f"{fmt(r['nvc_rate_both_pct_mean'], r['nvc_rate_both_pct_std'])} & "
-                f"{fmt(r['nvc_rate_only_cls_pct_mean'], r['nvc_rate_only_cls_pct_std'])} & "
-                f"{fmt(r['nvc_rate_only_wcs_pct_mean'], r['nvc_rate_only_wcs_pct_std'])} & "
-                f"{fmt(r['nvc_rate_neither_pct_mean'], r['nvc_rate_neither_pct_std'])} \\\\\n"
-            )
-        f.write(
-            "\\bottomrule\n"
-            "\\end{tabular}\n"
-            "\\caption{Model \\emph{Cannot determine} rate (\\%) on "
-            "(item, conclusion) pairs, grouped by whether each framework "
-            "assigns C (Cannot determine) as the gold label. ``Both'' = both "
-            "frameworks say C; ``Classical only'' = only Classical Logic; "
-            "``WCS only'' = only WCS; ``Neither'' = neither framework says "
-            f"C. Bucket sizes: $n = {n_both}$ (Both), ${n_only_cls}$ "
-            f"(Classical only), ${n_only_wcs}$ (WCS only), ${n_neither}$ "
-            "(Neither). Values are mean $\\pm$ std across sampling seeds.}\n"
-            "\\label{tab:cannot-determine-per-frameworks}\n"
-            "\\end{table}\n"
+        for row in csv_rows:
+            cells = [row["model"]] + [
+                fmt(row[f"nvc_rate_{bucket}_pct_mean"], row[f"nvc_rate_{bucket}_pct_std"])
+                for bucket in ("both", "only_cls", "only_wcs", "neither")
+            ]
+            output.write(" & ".join(cells) + r" \\" + "\n")
+        output.write(
+            "\\bottomrule\n\\end{tabular}\n\\vspace{4pt}\n"
+            "\\textbf{Panel B: Overall framework-specific CD response rate}\\\\\n"
+            "\\begin{tabular}{lrr}\n\\toprule\n"
+            "Model & Classical CD rate & WCS CD rate \\\\\n\\midrule\n"
         )
+        for row in csv_rows:
+            cells = [
+                row["model"],
+                fmt(row["nvc_rate_classical_cd_gold_pct_mean"], row["nvc_rate_classical_cd_gold_pct_std"]),
+                fmt(row["nvc_rate_wcs_cd_gold_pct_mean"], row["nvc_rate_wcs_cd_gold_pct_std"]),
+            ]
+            output.write(" & ".join(cells) + r" \\" + "\n")
+        output.write(
+            "\\bottomrule\n\\end{tabular}\n"
+            "\\caption{Model \\emph{Cannot determine} response rate (\\%) by gold-label category. Both = both frameworks label CD; Classical only = only Classical labels CD; WCS only = only WCS labels CD; Neither = neither labels CD. Bucket sizes are $n=409$, $45$, $24$, and $34$, respectively. Panel B combines Both + Classical only ($n=454$) for Classical and Both + WCS only ($n=433$) for WCS. Values are mean $\\pm$ standard deviation across ten generations.}\n"
+            "\\label{tab:cannot-determine-per-frameworks}\n\\end{table}\n"
+        )
+    print(f"Wrote {main_tex}")
     print(f"Wrote {bucket_tex}")
 
     # Gold distribution table

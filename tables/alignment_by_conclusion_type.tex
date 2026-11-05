@@ -2,7 +2,7 @@
 \centering
 \scriptsize
 \setlength{\tabcolsep}{3pt}
-\caption{Model responses split by conclusion type.}
+\caption{Model responses on Classical/WCS disagreement questions pooled across all four role conditions (none, child, teen, adult), split by conclusion type.}
 \label{tab:alignment-by-conclusion-type}
 \begin{tabular}{llrrrrrr}
 \toprule
@@ -24,5 +24,6 @@ OLMo-2-13B & Particular (I/O) & 180 & 42.6\% & 38.2\% & 19.2\% & 0.0\% & -4.4 pp
 \end{tabular}
 \vspace{2pt}
 \begin{minipage}{\linewidth}
+\scriptsize Universal conclusions begin with A or E; particular conclusions begin with I or O. $n$ counts unique disagreement prompts pooled across all four roles, each evaluated with 10 generations. Percentages use all generated responses, including invalid outputs; $\Delta_{W-C}$ is WCS-only minus Classical-only in percentage points.
 \end{minipage}
 \end{table}

@@ -56,7 +56,10 @@ def summarize_agreement(path: Path):
     return matrix, total
 
 
-def latex_table(counts, total):
+def latex_table(counts, total, count_divisor=64):
+    if count_divisor < 1:
+        raise ValueError("count_divisor must be at least 1")
+
     rows = []
     for method in ("classical", "wcs"):
         method_label = "Classical" if method == "classical" else "WCS"
@@ -64,6 +67,15 @@ def latex_table(counts, total):
         no = counts[method]["No"]
         cannot = counts[method]["Cannot determine"]
         total_n = total[method]
+        values = (yes, no, cannot, total_n)
+        if any(value % count_divisor for value in values):
+            raise ValueError(
+                f"{method} counts and total must be divisible by {count_divisor}"
+            )
+        yes //= count_divisor
+        no //= count_divisor
+        cannot //= count_divisor
+        total_n //= count_divisor
         rows.append(
             f"{method_label} & {yes} ({yes / total_n * 100:.1f}\\%) & "
             f"{no} ({no / total_n * 100:.1f}\\%) & "
@@ -107,9 +119,18 @@ def latex_agreement_table(matrix, total):
     )
 
 
-def latex_agreement_heatmap_table(matrix, total):
+def latex_agreement_heatmap_table(matrix, total, count_divisor=64):
+    if count_divisor < 1:
+        raise ValueError("count_divisor must be at least 1")
+    cell_counts = [matrix[c][w] for c in LABEL_ORDER for w in LABEL_ORDER]
+    if total % count_divisor or any(n % count_divisor for n in cell_counts):
+        raise ValueError(
+            f"Agreement counts and total must be divisible by {count_divisor}"
+        )
+
     header = "Classical / WCS"
     lines = []
+    normalized_total = total // count_divisor
 
     # Use global percentage for shading intensity so cells are comparable.
     for c in LABEL_ORDER:
@@ -117,9 +138,10 @@ def latex_agreement_heatmap_table(matrix, total):
         cells = []
         for w in LABEL_ORDER:
             n = matrix[c][w]
-            pct_global = (100.0 * n / total) if total else 0.0
+            display_count = n // count_divisor
+            pct_global = (100.0 * display_count / normalized_total) if normalized_total else 0.0
             shade = max(0, min(100, int(round(pct_global))))
-            cells.append(f"\\cellcolor{{blue!{shade}}}{n} ({pct_global:.1f}\\%)")
+            cells.append(f"\\cellcolor{{blue!{shade}}}{display_count} ({pct_global:.1f}\\%)")
         lines.append(f"{row_name} & {cells[0]} & {cells[1]} & {cells[2]} \\\\")
 
     return (
@@ -131,7 +153,7 @@ def latex_agreement_heatmap_table(matrix, total):
         f"{chr(10).join(lines)}\n"
         "\\bottomrule\n"
         "\\end{tabular}\n"
-        f"% Total evaluated conclusions: {total}\n"
+        f"% Total evaluated conclusions after normalization by {count_divisor}: {normalized_total}\n"
     )
 
 
@@ -150,6 +172,12 @@ def main():
         help="Output path for the LaTeX table.",
     )
     parser.add_argument(
+        "--count-divisor",
+        type=int,
+        default=64,
+        help="Normalize displayed label counts and denominator by this factor (default: 64).",
+    )
+    parser.add_argument(
         "--agreement-out",
         type=Path,
         default=Path("tables/classical_wcs_agreement.tex"),
@@ -164,10 +192,12 @@ def main():
     args = parser.parse_args()
 
     counts, total = summarize_dataset(args.dataset)
-    latex = latex_table(counts, total)
+    latex = latex_table(counts, total, args.count_divisor)
     matrix, matrix_total = summarize_agreement(args.dataset)
     agreement_latex = latex_agreement_table(matrix, matrix_total)
-    agreement_heatmap_latex = latex_agreement_heatmap_table(matrix, matrix_total)
+    agreement_heatmap_latex = latex_agreement_heatmap_table(
+        matrix, matrix_total, args.count_divisor
+    )
 
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text(latex, encoding="utf-8")

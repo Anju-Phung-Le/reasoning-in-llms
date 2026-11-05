@@ -1,4 +1,8 @@
 \begin{table}[H]
+\centering
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\textbf{Panel A: CD response rate by gold-label category}\\
 \begin{tabular}{lrrrr}
 \toprule
 Model & Both & Classical only & WCS only & Neither \\
@@ -11,6 +15,20 @@ DeepSeek-R1-Distill-Qwen-14B & 76.70 $\pm$ 1.70 & 52.44 $\pm$ 4.59 & 12.92 $\pm$
 Mistral-Small-24B & 78.00 $\pm$ 1.40 & 50.89 $\pm$ 2.21 & 32.08 $\pm$ 3.95 & 5.88 $\pm$ 1.96 \\
 \bottomrule
 \end{tabular}
-\caption{Model \emph{Cannot determine} rate (\%) on (item, conclusion) pairs, grouped by whether each framework assigns C (Cannot determine) as the gold label. ``Both'' = both frameworks say C; ``Classical only'' = only Classical Logic; ``WCS only'' = only WCS; ``Neither'' = neither framework says C. Bucket sizes: $n = 409$ (Both), $45$ (Classical only), $24$ (WCS only), $34$ (Neither). Values are mean $\pm$ std across sampling seeds.}
+\vspace{4pt}
+\textbf{Panel B: Overall framework-specific CD response rate}\\
+\begin{tabular}{lrr}
+\toprulewhy
+Model & Classical CD rate & WCS CD rate \\
+\midrule
+Mistral-7B & 17.56 $\pm$ 0.67 & 17.69 $\pm$ 0.64 \\
+Llama-3.1-8B & 31.94 $\pm$ 1.70 & 32.52 $\pm$ 1.56 \\
+OLMo-2-13B & 22.11 $\pm$ 1.13 & 22.03 $\pm$ 1.25 \\
+DeepSeek-R1-Distill-Llama-8B & 42.38 $\pm$ 1.33 & 41.45 $\pm$ 1.13 \\
+DeepSeek-R1-Distill-Qwen-14B & 74.30 $\pm$ 1.68 & 73.16 $\pm$ 1.56 \\
+Mistral-Small-24B & 75.31 $\pm$ 1.20 & 75.45 $\pm$ 1.18 \\
+\bottomrule
+\end{tabular}
+\caption{Model \emph{Cannot determine} response rate (\%) by gold-label category. Both = both frameworks label CD; Classical only = only Classical labels CD; WCS only = only WCS labels CD; Neither = neither labels CD. Bucket sizes are $n=409$, $45$, $24$, and $34$, respectively. Panel B combines Both + Classical only ($n=454$) for Classical and Both + WCS only ($n=433$) for WCS. Values are mean $\pm$ standard deviation across ten generations.}
 \label{tab:cannot-determine-per-frameworks}
 \end{table}

@@ -11,11 +11,11 @@ ROLE_ORDER = ["none", "child", "teen", "adult"]
 DOMAIN_ORDER = ["animals", "nature", "objects", "people"]
 MODEL_LABELS = {
     "mistral7b_vllm": "Mistral-7B",
-    "llama8b_vllm": "Llama-3.1-8B",
-    "olmo2_13b_vllm": "OLMo-2-13B",
-    "deepseek_llama_8b_vllm": "DeepSeek-R1-Distill-Llama-8B",
-    "deepseek_qwen_14b_vllm": "DeepSeek-R1-Distill-Qwen-14B",
-    "mistral24B_vllm": "Mistral-Small-24B",
+    "llama8b_vllm": "Llama-8B",
+    "olmo2_13b_vllm": "OLMo-13B",
+    "deepseek_llama_8b_vllm": "DeepSeek-Llama-8B",
+    "deepseek_qwen_14b_vllm": "DeepSeek-Qwen-14B",
+    "mistral24B_vllm": "Mistral-24B",
 }
 
 
@@ -120,21 +120,29 @@ def compute_model_stats(gold_rows):
     return model_stats
 
 
-def intensity_for_value(value, min_val=0.0, max_val=100.0, base=8, top=90):
-    if max_val <= min_val:
-        return base
-    frac = (value - min_val) / (max_val - min_val)
-    return int(round(base + frac * (top - base)))
+def intensity_for_value(value):
+    return int(round(max(0.0, min(100.0, value))))
+
+
+def heatmap_cell(value, color_name):
+    palettes = {
+        "green": (60, 120, 75),
+        "blue": (60, 88, 150),
+    }
+    intensity = intensity_for_value(value)
+    fraction = intensity / 100.0
+    rgb = tuple(round(255 + (channel - 255) * fraction) for channel in palettes[color_name])
+    luminance = 0.2126 * rgb[0] + 0.7152 * rgb[1] + 0.0722 * rgb[2]
+    text_color = "black" if luminance >= 145 else "white"
+    hex_color = "".join(f"{channel:02X}" for channel in rgb)
+    return f"\\cellcolor[HTML]{{{hex_color}}}\\textcolor{{{text_color}}}{{{value:.2f}}}"
 
 
 def latex_row(model_name, values, columns, color_name):
     cells = [model_name]
-    max_val = max(values.values()) if values else 0.0
-    min_val = min(values.values()) if values else 0.0
     for key in columns:
         v = values.get(key, 0.0)
-        intensity = intensity_for_value(v, min_val, max_val)
-        cells.append(f"\\cellcolor{{{color_name}!{intensity}}}{{{v:.2f}}}")
+        cells.append(heatmap_cell(v, color_name))
     return " & ".join(cells) + r" \\" + "\n"
 
 

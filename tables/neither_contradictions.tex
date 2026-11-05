@@ -1,0 +1,26 @@
+\begin{table}[htbp]
+\centering
+\scriptsize
+\setlength{\tabcolsep}{5pt}
+\caption{Neither response rates and conditional direct-contradiction rates on neutral-role disagreement questions.}
+\label{tab:neither-direct-contradictions}
+\begin{tabular}{lrrr}
+\toprule
+Model & Neither / 69 (\%) & Classical definite / 24 (\%) & WCS definite / 45 (\%) \\
+\midrule
+Flan-T5 Small & 47.83\% & 50.00\% & 46.67\% \\
+Flan-T5 Base & 23.19\% & 25.00\% & 22.22\% \\
+Flan-T5 Large & 23.19\% & 16.67\% & 26.67\% \\
+Mistral-7B & 17.54 $\pm$ 2.51\% & 8.33 $\pm$ 4.39\% & 22.44 $\pm$ 2.21\% \\
+Llama-3.1-8B & 6.52 $\pm$ 1.71\% & 2.08 $\pm$ 2.20\% & 8.89 $\pm$ 3.14\% \\
+OLMo-2-13B & 19.86 $\pm$ 2.74\% & 15.83 $\pm$ 4.30\% & 22.00 $\pm$ 5.18\% \\
+DeepSeek-Llama-8B & 5.80 $\pm$ 1.81\% & 0.42 $\pm$ 1.32\% & 8.67 $\pm$ 2.45\% \\
+DeepSeek-Qwen-14B & 1.74 $\pm$ 1.33\% & 0.00 $\pm$ 0.00\% & 2.67 $\pm$ 2.04\% \\
+Mistral-Small-24B & 0.87 $\pm$ 0.75\% & 0.00 $\pm$ 0.00\% & 1.33 $\pm$ 1.15\% \\
+\bottomrule
+\end{tabular}
+\vspace{2pt}
+\begin{minipage}{\linewidth}
+\scriptsize Neither rate uses all 69 questions. The Classical and WCS columns are conditional rates: direct contradictions divided by questions where that framework gives a definite Yes/No label ($n=24$ for Classical; $n=45$ for WCS). CD is not a direct contradiction. vLLM entries are mean $\pm$ SD over ten generations; FLAN-T5 entries are deterministic. Category-specific counts are in the CSV report.
+\end{minipage}
+\end{table}

@@ -2,6 +2,13 @@ import json
 from collections import Counter, defaultdict
 from pathlib import Path
 
+import matplotlib
+
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt
+from matplotlib.colors import LinearSegmentedColormap, TwoSlopeNorm
+from matplotlib.patches import Patch
+
 ROOT = Path(__file__).resolve().parents[1]
 GOLD_PATH = ROOT / "data/processed/dataset_sub256.jsonl"
 PREDICTION_ROOT = ROOT / "data/predictions/vllm"
@@ -129,7 +136,7 @@ def write_form_table(stats, cases, path: Path):
         r"\scriptsize",
         r"\setlength{\tabcolsep}{3pt}",
         r"\caption{Net WCS-versus-Classical alignment on disagreement questions pooled across all four role conditions (none, child, teen, adult), by syllogistic form. The 27 forms shown are those with disagreements among the 64 possible forms. Entries are percentage-point differences: WCS-only response rate minus Classical-only response rate.}",
-        r"\label{tab:alignment-by-syllogistic-form}",
+        r"\label{tab:alignment-by-syllogistic-form-appendix}",
         r"\begin{tabular}{lrrrrrrr}",
         r"\toprule",
         r"Form & $n$ & Llama-8B & DS-Llama & DS-Qwen & Mistral-7B & Mistral-24B & OLMo-13B \\",
@@ -156,6 +163,77 @@ def write_form_table(stats, cases, path: Path):
         ]
     )
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+
+def write_form_heatmap(stats, cases, pdf_path: Path, tex_path: Path):
+    forms = sorted({case["form"] for case in cases.values()})
+    prompts_by_form = Counter(case["form"] for case in cases.values())
+    values = [
+        [
+            rate_delta(stats[model]["by_form"][form]) if model in stats else 0.0
+            for model in MODEL_ORDER
+        ]
+        for form in forms
+    ]
+
+    cmap = LinearSegmentedColormap.from_list(
+        "classical_neutral_wcs",
+        ["#3C784B", "#F2F1ED", "#3C5896"],
+    )
+    norm = TwoSlopeNorm(vmin=-100, vcenter=0, vmax=100)
+    figure_height = max(11.0, len(forms) * 0.40)
+    figure, axis = plt.subplots(figsize=(8.5, figure_height))
+    image = axis.imshow(values, aspect="auto", cmap=cmap, norm=norm)
+
+    axis.set_xticks(range(len(MODEL_ORDER)))
+    axis.set_xticklabels([MODEL_LABELS[model] for model in MODEL_ORDER], rotation=30, ha="right", fontsize=11)
+    axis.set_yticks(range(len(forms)))
+    axis.set_yticklabels([f"{form} (n={prompts_by_form[form]})" for form in forms], fontsize=10)
+
+    axis.set_xticks([index - 0.5 for index in range(len(MODEL_ORDER) + 1)], minor=True)
+    axis.set_yticks([index - 0.5 for index in range(len(forms) + 1)], minor=True)
+    axis.grid(which="minor", color="white", linewidth=1.2)
+    axis.tick_params(which="minor", bottom=False, left=False)
+    axis.tick_params(axis="x", top=True, labeltop=True, bottom=False, labelbottom=False)
+
+    for row_index, row in enumerate(values):
+        for column_index, value in enumerate(row):
+            red, green, blue, _ = cmap(norm(value))
+            luminance = 0.2126 * red + 0.7152 * green + 0.0722 * blue
+            text_color = "white" if luminance < 0.48 else "#20252A"
+            axis.text(column_index, row_index, f"{value:+.1f}", ha="center", va="center", color=text_color, fontsize=10)
+
+    colorbar = figure.colorbar(image, ax=axis, ticks=[-100, -50, 0, 50, 100], pad=0.025)
+    colorbar.ax.tick_params(labelsize=9)
+    colorbar.ax.set_yticklabels(["-100 Classical", "-50", "0 Neutral", "+50", "+100 WCS"])
+    axis.legend(
+        handles=[
+            Patch(facecolor="#3C784B", label="Negative: Classical-leaning"),
+            Patch(facecolor="#F2F1ED", edgecolor="#A0A0A0", label="Near zero: no excess"),
+            Patch(facecolor="#3C5896", label="Positive: WCS-leaning"),
+        ],
+        loc="lower center",
+        bbox_to_anchor=(0.5, -0.12),
+        ncol=3,
+        frameon=False,
+        fontsize=9,
+    )
+    figure.tight_layout(rect=(0, 0.035, 1, 1))
+    pdf_path.parent.mkdir(parents=True, exist_ok=True)
+    figure.savefig(pdf_path, format="pdf", bbox_inches="tight")
+    plt.close(figure)
+
+    tex_path.write_text(
+        "\n".join([
+            r"\begin{figure}[htbp]",
+            r"\centering",
+            r"\includegraphics[width=\linewidth,height=0.94\textheight,keepaspectratio]{tables/alignment_by_syllogistic_form_heatmap.pdf}",
+            r"\caption{Excess WCS-only minus Classical-only response rate by syllogistic form. Green indicates a Classical-leaning excess; blue indicates a WCS-leaning excess; pale colors indicate values near zero. Each row gives the number of unique disagreement prompts pooled across all four role conditions. The shared color scale runs from $-100$ to $+100$ percentage points and is centered at zero.}",
+            r"\label{tab:alignment-by-syllogistic-form}",
+            r"\end{figure}",
+        ]) + "\n",
+        encoding="utf-8",
+    )
 
 
 def write_conclusion_type_table(stats, cases, path: Path):
@@ -213,9 +291,12 @@ def main():
             stats[model] = model_stats
 
     TABLES_DIR.mkdir(parents=True, exist_ok=True)
-    form_path = TABLES_DIR / "alignment_by_syllogistic_form.tex"
+    form_path = TABLES_DIR / "alignment_by_syllogistic_form_appendix.tex"
+    figure_tex_path = TABLES_DIR / "alignment_by_syllogistic_form.tex"
+    figure_pdf_path = TABLES_DIR / "alignment_by_syllogistic_form_heatmap.pdf"
     type_path = TABLES_DIR / "alignment_by_conclusion_type.tex"
     write_form_table(stats, cases, form_path)
+    write_form_heatmap(stats, cases, figure_pdf_path, figure_tex_path)
     write_conclusion_type_table(stats, cases, type_path)
 
     print(f"Gold disagreement prompts: {len(cases)}")
@@ -225,6 +306,8 @@ def main():
         invalid = sum(model_stats["by_type"][kind]["invalid"] for kind in CONCLUSION_TYPES)
         print(f"{MODEL_LABELS[model]}: {model_stats['runs']} runs, {total} responses, {invalid} invalid")
     print(f"Wrote {form_path}")
+    print(f"Wrote {figure_tex_path}")
+    print(f"Wrote {figure_pdf_path}")
     print(f"Wrote {type_path}")
 
 
