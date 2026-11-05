@@ -1,0 +1,36 @@
+\begin{table}[H]
+\centering
+\setlength{\tabcolsep}{3pt}
+\caption{Model \emph{Cannot determine} response rate (\%) by gold-label category. Both = both frameworks label CD; Classical only = only Classical labels CD; WCS only = only WCS labels CD; Neither = neither labels CD.}
+\label{tab:cannot-determine-per-frameworks}
+\textbf{Panel A: CD response rate by gold-label category}\\
+\par\vspace{4pt}
+\begin{tabular}{lrrrr}
+\toprule
+Model & Both & Classical only & WCS only & Neither \\
+\midrule
+Mistral-7B & 17.75 $\pm$ 0.65 & 15.78 $\pm$ 3.05 & 16.67 $\pm$ 4.39 & 4.71 $\pm$ 1.52 \\
+Llama-3.1-8B & 33.08 $\pm$ 1.63 & 21.56 $\pm$ 5.14 & 22.92 $\pm$ 8.39 & 4.71 $\pm$ 2.06 \\
+OLMo-2-13B & 22.96 $\pm$ 1.35 & 14.44 $\pm$ 5.16 & 6.25 $\pm$ 4.50 & 7.35 $\pm$ 4.22 \\
+DeepSeek-R1-Distill-Llama-8B & 43.35 $\pm$ 1.19 & 33.56 $\pm$ 5.49 & 9.17 $\pm$ 5.12 & 4.71 $\pm$ 2.84 \\
+DeepSeek-R1-Distill-Qwen-14B & 76.70 $\pm$ 1.70 & 52.44 $\pm$ 4.59 & 12.92 $\pm$ 4.99 & 0.00 $\pm$ 0.00 \\
+Mistral-Small-24B & 78.00 $\pm$ 1.40 & 50.89 $\pm$ 2.21 & 32.08 $\pm$ 3.95 & 5.88 $\pm$ 1.96 \\
+\bottomrule
+\end{tabular}
+\vspace{4pt}
+
+\textbf{Panel B: Framework specific CD Recall}\\
+\par\vspace{4pt}
+\begin{tabular}{lrr}
+\toprule
+Model & Classical CD rate & WCS CD rate \\
+\midrule
+Mistral-7B & 17.56 $\pm$ 0.67 & 17.69 $\pm$ 0.64 \\
+Llama-3.1-8B & 31.94 $\pm$ 1.70 & 32.52 $\pm$ 1.56 \\
+OLMo-2-13B & 22.11 $\pm$ 1.13 & 22.03 $\pm$ 1.25 \\
+DeepSeek-R1-Distill-Llama-8B & 42.38 $\pm$ 1.33 & 41.45 $\pm$ 1.13 \\
+DeepSeek-R1-Distill-Qwen-14B & 74.30 $\pm$ 1.68 & 73.16 $\pm$ 1.56 \\
+Mistral-Small-24B & 75.31 $\pm$ 1.20 & 75.45 $\pm$ 1.18 \\
+\bottomrule
+\end{tabular}
+\end{table}
