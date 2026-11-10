@@ -23,12 +23,12 @@ MODEL_ORDER = [
     "olmo2_13b_vllm",
 ]
 MODEL_LABELS = {
-    "llama8b_vllm": "Llama-3.1-8B",
+    "llama8b_vllm": "Llama-8B",
     "deepseek_llama_8b_vllm": "DS-Llama-8B",
     "deepseek_qwen_14b_vllm": "DS-Qwen-14B",
     "mistral7b_vllm": "Mistral-7B",
     "mistral24B_vllm": "Mistral-24B",
-    "olmo2_13b_vllm": "OLMo-2-13B",
+    "olmo2_13b_vllm": "OLMo-13B",
 }
 OUTCOMES = ("classical_only", "wcs_only", "neither", "invalid")
 CONCLUSION_TYPES = ("Universal (A/E)", "Particular (I/O)")
@@ -165,13 +165,19 @@ def write_form_table(stats, cases, path: Path):
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
-def write_form_heatmap(stats, cases, pdf_path: Path, tex_path: Path):
+def write_form_heatmap(
+    stats, cases, pdf_path: Path, tex_path: Path,
+    model_order=None, model_labels=None, graphic_path=None, label_suffix="",
+):
+    model_order = MODEL_ORDER if model_order is None else model_order
+    model_labels = MODEL_LABELS if model_labels is None else model_labels
+    graphic_path = graphic_path or "tables/alignment_by_syllogistic_form_heatmap.pdf"
     forms = sorted({case["form"] for case in cases.values()})
     prompts_by_form = Counter(case["form"] for case in cases.values())
     values = [
         [
             rate_delta(stats[model]["by_form"][form]) if model in stats else 0.0
-            for model in MODEL_ORDER
+            for model in model_order
         ]
         for form in forms
     ]
@@ -182,15 +188,16 @@ def write_form_heatmap(stats, cases, pdf_path: Path, tex_path: Path):
     )
     norm = TwoSlopeNorm(vmin=-100, vcenter=0, vmax=100)
     figure_height = max(11.0, len(forms) * 0.40)
-    figure, axis = plt.subplots(figsize=(8.5, figure_height))
+    figure_width = max(8.5, len(model_order) * 1.4)
+    figure, axis = plt.subplots(figsize=(figure_width, figure_height))
     image = axis.imshow(values, aspect="auto", cmap=cmap, norm=norm)
 
-    axis.set_xticks(range(len(MODEL_ORDER)))
-    axis.set_xticklabels([MODEL_LABELS[model] for model in MODEL_ORDER], rotation=30, ha="right", fontsize=11)
+    axis.set_xticks(range(len(model_order)))
+    axis.set_xticklabels([model_labels[model] for model in model_order], rotation=0, ha="center", fontsize=9)
     axis.set_yticks(range(len(forms)))
     axis.set_yticklabels([f"{form} (n={prompts_by_form[form]})" for form in forms], fontsize=10)
 
-    axis.set_xticks([index - 0.5 for index in range(len(MODEL_ORDER) + 1)], minor=True)
+    axis.set_xticks([index - 0.5 for index in range(len(model_order) + 1)], minor=True)
     axis.set_yticks([index - 0.5 for index in range(len(forms) + 1)], minor=True)
     axis.grid(which="minor", color="white", linewidth=1.2)
     axis.tick_params(which="minor", bottom=False, left=False)
@@ -209,7 +216,7 @@ def write_form_heatmap(stats, cases, pdf_path: Path, tex_path: Path):
     axis.legend(
         handles=[
             Patch(facecolor="#3C784B", label="Negative: Classical-leaning"),
-            Patch(facecolor="#F2F1ED", edgecolor="#A0A0A0", label="Near zero: no excess"),
+            Patch(facecolor="#F2F1ED", edgecolor="#A0A0A0", label="Near zero: little relative preference"),
             Patch(facecolor="#3C5896", label="Positive: WCS-leaning"),
         ],
         loc="lower center",
@@ -227,9 +234,9 @@ def write_form_heatmap(stats, cases, pdf_path: Path, tex_path: Path):
         "\n".join([
             r"\begin{figure}[htbp]",
             r"\centering",
-            r"\includegraphics[width=\linewidth,height=0.94\textheight,keepaspectratio]{tables/alignment_by_syllogistic_form_heatmap.pdf}",
-            r"\caption{Excess WCS-only minus Classical-only response rate by syllogistic form. Green indicates a Classical-leaning excess; blue indicates a WCS-leaning excess; pale colors indicate values near zero. Each row gives the number of unique disagreement prompts pooled across all four role conditions. The shared color scale runs from $-100$ to $+100$ percentage points and is centered at zero.}",
-            r"\label{tab:alignment-by-syllogistic-form}",
+            r"\includegraphics[width=\linewidth,height=0.94\textheight,keepaspectratio]{" + graphic_path + "}",
+            r"\caption{WCS-only minus Classical-only response-rate difference by syllogistic form. Green indicates a more Classical-leaning difference; blue indicates a more WCS-leaning difference; pale colors indicate little relative preference. Each row gives the number of unique disagreement prompts pooled across all four role conditions. The shared color scale runs from $-100$ to $+100$ percentage points and is centered at zero.}",
+            r"\label{tab:alignment-by-syllogistic-form" + label_suffix + "}",
             r"\end{figure}",
         ]) + "\n",
         encoding="utf-8",

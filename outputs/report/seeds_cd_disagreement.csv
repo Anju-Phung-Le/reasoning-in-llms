@@ -1,7 +1,0 @@
-model,n_seeds,overall_nvc_pct_mean,overall_nvc_pct_std,disagreement_nvc_pct_mean,disagreement_nvc_pct_std,classical_match_pct_mean,classical_match_pct_std,wcs_match_pct_mean,wcs_match_pct_std
-Mistral-7B,10,16.66,0.63,16.09,2.93,36.09,2.77,45.8,2.39
-Llama-3.1-8B,10,29.71,1.61,22.03,4.57,39.86,3.82,51.88,3.79
-OLMo-2-13B,10,20.39,1.1,11.59,4.37,36.52,1.91,43.62,3.01
-DeepSeek-R1-Distill-Llama-8B,10,38.32,1.2,25.07,4.53,53.33,3.6,40.87,2.8
-DeepSeek-R1-Distill-Qwen-14B,10,66.48,1.43,38.7,2.56,64.49,4.17,33.77,3.99
-Mistral-Small-24B,10,68.67,1.01,44.35,2.07,56.81,1.91,42.32,2.25

@@ -1,3 +1,0 @@
-model,n_disagreement,classical_match_pct,wcs_match_pct,neither_pct,unparsed_pct,wcs_minus_classical_pp
-"DeepSeek-8B (CoT, 1024)",12,50.0,50.0,0.0,0.0,0.0
-"Mistral-7B (CoT, 128)",12,58.33,33.33,8.33,0.0,-25.0

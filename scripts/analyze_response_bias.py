@@ -12,6 +12,7 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from matplotlib.patches import Patch
+from matplotlib.transforms import blended_transform_factory
 
 from analyze_neither_alignment import (
     CATEGORY_INFO,
@@ -32,6 +33,17 @@ TABLES_DIR = ROOT / "tables"
 N_SHUFFLES = 5000
 RANDOM_SEED = 20261104
 INVALID = 3
+FIGURE_MODEL_LABELS = {
+    "Flan-T5 Small": "Flan-T5 Small",
+    "Flan-T5 Base": "Flan-T5 Base",
+    "Flan-T5 Large": "Flan-T5 Large",
+    "Mistral-7B": "Mistral-7B",
+    "Llama-3.1-8B": "Llama-8B",
+    "OLMo-2-13B": "OLMo-13B",
+    "DeepSeek-R1-Distill-Llama-8B": "DS-Llama-8B",
+    "DeepSeek-R1-Distill-Qwen-14B": "DS-Qwen-14B",
+    "Mistral-Small-24B": "Mistral-24B",
+}
 
 
 def valid_index(prediction):
@@ -358,22 +370,23 @@ def write_appendix_latex(path, model_runs):
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
-def write_excess_delta_figure(path, model_runs):
+def write_excess_delta_figure(path, model_runs, model_specs=None):
     labels = []
     means = []
     stds = []
-    for spec in MODEL_SPECS:
+    for spec in MODEL_SPECS if model_specs is None else model_specs:
         runs = model_runs[spec["name"]]
         mean, sd = aggregate_runs(
             runs,
             lambda item: item["analysis"]["observed"]["excess_delta_pp"],
         )
-        labels.append(spec["short"])
+        labels.append(FIGURE_MODEL_LABELS.get(spec["name"], spec["short"]))
         means.append(mean)
         stds.append(sd)
 
     colors = [
-        "#4E805D" if value > 0 else "#5A7898" if value < 0 else "#78818A"
+        # Same convention as the by-form heatmap: blue for WCS, green for Classical.
+        "#5A7898" if value > 0 else "#4E805D" if value < 0 else "#78818A"
         for value in means
     ]
     positions = list(range(len(labels)))
@@ -409,15 +422,27 @@ def write_excess_delta_figure(path, model_runs):
         else:
             axis.text(value - error - 0.5, position, f"{value:+.2f}", va="center", ha="right", fontsize=8)
 
-    axis.legend(
+    # Bottom corner on the empty side of the zero line: the last bar points the other way,
+    # so the legend sits inside the plot without covering it.
+    legend_on_right = means[-1] <= 0
+    legend = axis.legend(
         handles=[
-            Patch(facecolor="#4E805D", edgecolor="#36414A", label="WCS above baseline"),
-            Patch(facecolor="#5A7898", edgecolor="#36414A", label="Classical above baseline"),
+            Patch(facecolor="#5A7898", edgecolor="#36414A", label="WCS above baseline"),
+            Patch(facecolor="#4E805D", edgecolor="#36414A", label="Classical above baseline"),
         ],
-        loc="lower right",
+        loc="lower left" if legend_on_right else "lower right",
+        bbox_to_anchor=(0.6 if legend_on_right else -0.6, 0.0),
+        bbox_transform=blended_transform_factory(axis.transData, axis.transAxes),
         frameon=False,
         fontsize=8,
     )
+    # Widen the axis if needed so the whole legend stays within it.
+    for _ in range(3):
+        figure.tight_layout()
+        figure.canvas.draw()
+        extent = legend.get_window_extent().transformed(axis.transData.inverted())
+        x_min, x_max = axis.get_xlim()
+        axis.set_xlim(min(x_min, extent.x0 - 0.5), max(x_max, extent.x1 + 0.5))
     figure.tight_layout()
     path.parent.mkdir(parents=True, exist_ok=True)
     figure.savefig(path, format="pdf", bbox_inches="tight")

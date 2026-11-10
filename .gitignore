@@ -1,6 +1,20 @@
-data/
+# Data and outputs are ignored, except the inputs needed to reproduce the thesis tables
+# with scripts/final2_*.py: the final chain-of-thought predictions, the FLAN-T5 predictions,
+# and the evaluation logs that two of the scripts check their numbers against.
+data/*
+!data/predictions/
+data/predictions/*
+!data/predictions/final/
+data/predictions/final/*
+!data/predictions/final/*_cot_allforms_predictions_sample[0-4].jsonl
+!data/predictions/all_forms/
+data/predictions/all_forms/*
+!data/predictions/all_forms/flan_t5_*_all_forms_predictions.jsonl
 logs/
-outputs/
+outputs/*
+!outputs/final/
+outputs/final/*
+!outputs/final/*_cot_allforms_sample[0-4]_outputs_log.csv
 .venv/
 __pycache__/
 *.pyc

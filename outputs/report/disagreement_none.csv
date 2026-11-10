@@ -1,5 +1,0 @@
-model,n_disagreement,classical_match_pct,wcs_match_pct,neither_pct,unparsed_pct,wcs_minus_classical_pp
-Flan-T5 Small,1280,22.5,30.0,47.5,0.0,7.5
-Flan-T5 Base,1280,33.28,43.83,22.89,0.0,10.55
-Flan-T5 Large,1280,37.66,40.94,21.41,0.0,3.28
-Mistral-7B,1280,39.53,48.12,12.34,0.0,8.59
