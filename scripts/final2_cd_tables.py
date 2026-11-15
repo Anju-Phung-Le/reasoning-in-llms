@@ -16,7 +16,7 @@ REPORT_PATH = ROOT / "outputs/report/final2_cd_analysis.csv"
 LOG_DIR = ROOT / "outputs/final"
 BUCKETS = ("both", "only_cls", "only_wcs", "neither")
 RUNS_NOTE = (
-    r"Values are mean $\pm$ sample standard deviation across five sampling runs. "
+    r"Values are the mean across five sampling runs with the sample standard deviation in parentheses. "
     "Unparsed responses are kept in every denominator and count as non-CD responses."
 )
 
@@ -39,14 +39,15 @@ def supervisor_log_gaps(path, metrics, framework_metrics):
     log_name = path.name.replace("_predictions_", "_").replace(".jsonl", "_outputs_log.csv")
     with (LOG_DIR / log_name).open(encoding="utf-8") as source:
         row = next(r for r in csv.DictReader(source) if r["role"] == "none")
+    # The logs predate the WCS gold-label correction, so WCS metrics are only reported, not enforced.
     same_definition = {
         "c_usage": metrics["model_NVC_pct"] / 100,
         "precision_C_classical": framework_metrics["classical"]["precision"],
-        "precision_C_wcs": framework_metrics["wcs"]["precision"],
     }
     recall = {
         "recall_C_classical": framework_metrics["classical"]["recall"],
         "recall_C_wcs": framework_metrics["wcs"]["recall"],
+        "precision_C_wcs": framework_metrics["wcs"]["precision"],
     }
     gap = max(abs(value - float(row[key])) for key, value in same_definition.items())
     if gap > 0.00051:
@@ -56,7 +57,7 @@ def supervisor_log_gaps(path, metrics, framework_metrics):
 
 def fmt(values):
     mean, sd = mean_std(values)
-    return f"{mean:.2f} $\\pm$ {sd:.2f}"
+    return f"{mean:.2f} ({sd:.2f})"
 
 
 def main():

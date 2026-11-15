@@ -49,8 +49,8 @@ def main():
     gold, runs_by_model = load_runs()
     targets = disagreement_targets(gold)
     total = len(targets)
-    if total != 1280:
-        raise ValueError(f"Expected 1280 neutral disagreements, found {total}")
+    if total != 1248:
+        raise ValueError(f"Expected 1248 neutral disagreements, found {total}")
 
     with MAIN_TABLE_CSV.open(encoding="utf-8") as source:
         main_rows = list(csv.DictReader(source))
@@ -119,7 +119,7 @@ def main():
         r"\scriptsize Base is the exact expected match rate under a uniform random permutation of the fixed answer "
         f"multiset; {N_SHUFFLES:,} actual shuffles estimate the corresponding null SD and check the expectation. "
         f"Excess = observed minus shuffled expectation. Percentages use all {total:,} questions. For CoT models, "
-        r"$\pm$ is the sample SD across five sampling runs; FLAN-T5 outputs are deterministic. This baseline controls "
+        r"parentheses give the sample SD across five sampling runs; FLAN-T5 outputs are deterministic. This baseline controls "
         "only answer frequencies, not question difficulty or dependencies among conclusions.",
         r"\end{minipage}",
         r"\end{table}",

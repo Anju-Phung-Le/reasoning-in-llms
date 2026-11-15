@@ -73,8 +73,8 @@ def check_against_main_table(stats):
 def main():
     gold, runs_by_model = load_runs(models=COT_MODELS)
     cases = disagreement_cases(gold)
-    if len(cases) != 1280:
-        raise ValueError(f"Expected 1280 neutral-role disagreement prompts, found {len(cases)}")
+    if len(cases) != 1248:
+        raise ValueError(f"Expected 1248 neutral-role disagreement prompts, found {len(cases)}")
 
     stats = {model: analyze(runs_by_model[model], cases) for model in MODEL_LABELS}
     check_against_main_table(stats)

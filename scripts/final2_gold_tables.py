@@ -31,7 +31,7 @@ def main():
     disagreements = [q for q in questions if q[2] != q[3]]
     distinct = {(form, code) for form, code, _, _ in disagreements}
     forms = {form for form, _ in distinct}
-    if (len(questions), len(disagreements), len(distinct)) != (8192, 1280, 80):
+    if (len(questions), len(disagreements), len(distinct)) != (8192, 1248, 78):
         raise ValueError(
             f"Unexpected sample: {len(questions)} questions, "
             f"{len(disagreements)} disagreements, {len(distinct)} distinct pairs"

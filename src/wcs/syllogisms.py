@@ -1,70 +1,80 @@
-from .tv import TV, l_and, l_implies, l_not, l_or
-def all_A_are_B(I, A, B):
-    values = []
-    o1 = 0
+"""Three-valued evaluation of the eight candidate conclusions against a least model.
+
+The Yes conditions implement the entailment definitions of Costa, Dietz, Hoelldobler
+and Ragni, "Syllogistic Reasoning under the Weak Completion Semantics" (Bridging 2016),
+Section 5, in their simplified (|=') form:
+
+  A: there is an object entailed to be in A, and every object entailed to be in A
+     is entailed to be in B. Objects whose A-membership is unknown are not counted.
+  E: as A, with "entailed to be outside B" in place of "entailed to be in B".
+  I: one object entailed to be in both A and B, and a second object entailed to be
+     in A whose B-membership is NOT entailed (the principle of unknown generalization,
+     so that "some" is never concluded when "all" already holds).
+  O: one object entailed to be in A and outside B, and a second object entailed to be
+     in A for which "outside B" is NOT entailed.
+
+The No and Cannot-Determine levels extend the paper's two-valued entailment to the
+benchmark's three answer options: No when the least model definitely refutes the
+statement (a counterexample for the universals; every known A-object refuting the
+witness for the particulars), and also when no object is or may be in A (failed
+existential import). Cannot Determine otherwise.
+"""
+
+from .tv import TV
+
+
+def _split(I, A, B):
+    """Return (B-values of objects entailed to be in A, whether any object's A-membership is unknown)."""
+    a_true = []
+    a_unknown = False
     for x in I.domain:
         a = I.get(A, x)
-        b = I.get(B, x)
-        values.append(l_implies(a, b))
-        if o1 < 1: o1 = max(o1, a.value) 
-    return TV(min(min(v.value for v in values), o1))
+        if a == TV.TRUE:
+            a_true.append(I.get(B, x))
+        elif a == TV.UNKNOWN:
+            a_unknown = True
+    return a_true, a_unknown
+
+
+def all_A_are_B(I, A, B):
+    a_true, a_unknown = _split(I, A, B)
+    if a_true and all(b == TV.TRUE for b in a_true):
+        return TV.TRUE
+    if any(b == TV.FALSE for b in a_true):
+        return TV.FALSE
+    if not a_true and not a_unknown:
+        return TV.FALSE
+    return TV.UNKNOWN
+
 
 def no_A_are_B(I, A, B):
-    values = []
-    o1 = 0
-    for x in I.domain:
-        a = I.get(A, x)
-        b = I.get(B, x)
-        values.append(l_implies(a, l_not(b)))
-        if o1 < 1: o1 = max(o1, a.value) 
-    return TV(min(min(v.value for v in values), o1))
+    a_true, a_unknown = _split(I, A, B)
+    if a_true and all(b == TV.FALSE for b in a_true):
+        return TV.TRUE
+    if any(b == TV.TRUE for b in a_true):
+        return TV.FALSE
+    if not a_true and not a_unknown:
+        return TV.FALSE
+    return TV.UNKNOWN
+
 
 def some_A_are_B(I, A, B):
-    saw_A_true = False # did we ever find an A that is TRUE?
-    saw_unknown_witness = False # did we find an A that is TRUE but B is UNKNOWN for that same A?
-
-    for x in I.domain:
-        a = I.get(A, x)
-        b = I.get(B, x)
-        if a == TV.TRUE:
-            saw_A_true = True
-            if b == TV.TRUE:
-                return TV.TRUE
-            if b == TV.UNKNOWN:
-                saw_unknown_witness = True
-
-    if saw_unknown_witness:
-        return TV.UNKNOWN
-    if saw_A_true:
+    a_true, a_unknown = _split(I, A, B)
+    if any(b == TV.TRUE for b in a_true) and any(b != TV.TRUE for b in a_true):
+        return TV.TRUE
+    if a_true and all(b == TV.FALSE for b in a_true):
         return TV.FALSE
-
-    # If A is never TRUE but could be UNKNOWN, existential is UNKNOWN - important for NVC cases.
-    for x in I.domain:
-        if I.get(A, x) == TV.UNKNOWN:
-            return TV.UNKNOWN
-    return TV.FALSE
+    if not a_true and not a_unknown:
+        return TV.FALSE
+    return TV.UNKNOWN
 
 
 def some_A_are_not_B(I, A, B):
-    saw_A_true = False
-    saw_unknown_witness = False
-
-    for x in I.domain:
-        a = I.get(A, x)
-        b = I.get(B, x)
-        if a == TV.TRUE:
-            saw_A_true = True
-            if b == TV.FALSE:
-                return TV.TRUE
-            if b == TV.UNKNOWN:
-                saw_unknown_witness = True
-
-    if saw_unknown_witness:
-        return TV.UNKNOWN
-    if saw_A_true:
+    a_true, a_unknown = _split(I, A, B)
+    if any(b == TV.FALSE for b in a_true) and any(b != TV.FALSE for b in a_true):
+        return TV.TRUE
+    if a_true and all(b == TV.TRUE for b in a_true):
         return TV.FALSE
-
-    for x in I.domain:
-        if I.get(A, x) == TV.UNKNOWN:
-            return TV.UNKNOWN
-    return TV.FALSE
+    if not a_true and not a_unknown:
+        return TV.FALSE
+    return TV.UNKNOWN

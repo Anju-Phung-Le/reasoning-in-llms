@@ -284,7 +284,7 @@ def answer_distribution_rows(model_runs):
 def format_value(mean, sd, runs, suffix="\\%"):
     if runs == 1:
         return f"{mean:.2f}{suffix}"
-    return f"{mean:.2f} $\\pm$ {sd:.2f}{suffix}"
+    return f"{mean:.2f}{suffix} ({sd:.2f})"
 
 
 def write_appendix_latex(path, model_runs):

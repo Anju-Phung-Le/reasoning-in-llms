@@ -83,7 +83,7 @@ def check_against_main_table(model_results, targets, denominators):
 def rate_cell(runs, targets, denominators, metric):
     """Mean (and SD over runs) without a unit; the column header carries the percent sign."""
     mean, sd = aggregate_metric([metric_values(run, targets, denominators) for run in runs], metric)
-    return f"{mean:.2f}" if len(runs) == 1 else f"{mean:.2f} $\\pm$ {sd:.2f}"
+    return f"{mean:.2f}" if len(runs) == 1 else f"{mean:.2f} ({sd:.2f})"
 
 
 def write_table(path, caption, label, header, metrics, footnote, model_results, targets, denominators):
@@ -120,8 +120,8 @@ def main():
     targets = disagreement_targets(gold)
     denominators = denominator_counts(targets)
     total = len(targets)
-    if total != 1280:
-        raise ValueError(f"Expected 1280 neutral disagreements, found {total}")
+    if total != 1248:
+        raise ValueError(f"Expected 1248 neutral disagreements, found {total}")
 
     model_results = {
         model: [analyze_run(targets, question_predictions(predictions, targets)) for _, predictions in runs]
@@ -132,7 +132,7 @@ def main():
     n_classical = denominators["classical_definite"]
     n_wcs = denominators["wcs_definite"]
     runs_note = (
-        r"CoT entries are mean $\pm$ sample standard deviation over five sampling runs; "
+        r"CoT entries are the mean over five sampling runs with the sample standard deviation in parentheses; "
         "FLAN-T5 entries are deterministic."
     )
     write_table(

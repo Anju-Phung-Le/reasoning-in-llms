@@ -23,7 +23,7 @@ from calc_classical_wcs_role_domain_alignment import (
     metric_by_group,
     summarize,
 )
-from final2_disagreement_table import COT_MODELS, ROOT, load_runs
+from final2_disagreement_table import DISPLAY_NAMES, ROOT, load_runs
 
 TABLES_DIR = ROOT / "tables"
 REPORT_PATH = ROOT / "outputs/report/final2_role_domain_alignment.csv"
@@ -50,9 +50,10 @@ def supervisor_log_gap(path, run_stats):
     log_name = path.name.replace("_predictions_", "_").replace(".jsonl", "_outputs_log.csv")
     with (LOG_DIR / log_name).open(encoding="utf-8") as source:
         rows = {row["role"]: row for row in csv.DictReader(source)}
+    # The logs predate the WCS gold-label correction, so only the Classical accuracies still match.
     return max(
-        abs(summarize(run_stats[framework]["role"][role]) / 100 - float(rows[role][f"acc_{framework}"]))
-        for framework, _, _ in FRAMEWORKS for role in ROLE_ORDER
+        abs(summarize(run_stats["classical"]["role"][role]) / 100 - float(rows[role]["acc_classical"]))
+        for role in ROLE_ORDER
     )
 
 
@@ -81,19 +82,21 @@ def disagreement_delta(gold_rows, predictions_by_id):
     return deltas, sizes
 
 
-def delta_cell(mean, sd):
+def delta_cell(values):
     """Shade a delta cell green (Classical-leaning) or blue (WCS-leaning).
 
     Uses the end colours and neutral midpoint of the by-form figure. The darkest shade is
     reached at +/-50 points, because per-role and per-domain values are smaller, and it is
     kept light enough for every number to stay in black.
     """
+    mean = statistics.fmean(values)
     neutral, classical, wcs = (242, 241, 237), (60, 120, 75), (60, 88, 150)
     target = wcs if mean > 0 else classical
     fraction = DELTA_DARKEST_SHADE * min(1.0, abs(mean) / DELTA_COLOUR_LIMIT)
     rgb = tuple(round(n + (t - n) * fraction) for n, t in zip(neutral, target))
     colour = "".join(f"{channel:02X}" for channel in rgb)
-    return f"\\cellcolor[HTML]{{{colour}}}{mean:+.2f} $\\pm$ {sd:.2f}"
+    spread = f" ({statistics.stdev(values):.2f})" if len(values) > 1 else ""
+    return f"\\cellcolor[HTML]{{{colour}}}{mean:+.2f}{spread}"
 
 
 def write_delta_table(path, deltas, group, columns, caption, label):
@@ -109,11 +112,9 @@ def write_delta_table(path, deltas, group, columns, caption, label):
         " & ".join(["Model", *(column.title() + r" $(\Delta)$" for column in columns)]) + r" \\",
         r"\midrule",
     ]
-    for model, label_text in MODEL_LABELS.items():
-        cells = [
-            delta_cell(statistics.fmean(deltas[model][group][column]), statistics.stdev(deltas[model][group][column]))
-            for column in columns
-        ]
+    # All ten models, in the order of the main disagreement table.
+    for model, label_text in DISPLAY_NAMES.items():
+        cells = [delta_cell(deltas[model][group][column]) for column in columns]
         lines.append(" & ".join([label_text, *cells]) + r" \\")
     lines.extend([r"\bottomrule", r"\end{tabular}", r"\end{table}"])
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
@@ -147,7 +148,7 @@ def write_heatmap(path, stats, group, columns, caption, label):
 
 
 def main():
-    gold, runs_by_model = load_runs(models=COT_MODELS)
+    gold, runs_by_model = load_runs()
     gold_rows = list(gold.values())
     questions = {
         group: Counter(row[group] for row in gold_rows for _ in row["conclusions"])
@@ -162,20 +163,22 @@ def main():
     stats = {}
     deltas = {}
     largest_log_gap = 0.0
-    for model in MODEL_LABELS:
+    for model in DISPLAY_NAMES:
         deltas[model] = {group: {key: [] for key in keys} for group, keys in GROUPS}
         main_deltas = [float(row["delta"]) for row in main_rows if row["model"] == model]
         pooled = {group: {framework: {key: [] for key in keys} for framework, _, _ in FRAMEWORKS} for group, keys in GROUPS}
         for (path, predictions_by_id), main_delta in zip(runs_by_model[model], main_deltas, strict=True):
             run_delta, sizes = disagreement_delta(gold_rows, predictions_by_id)
-            if any(size != 1280 for by_key in sizes.values() for size in by_key.values()):
-                raise ValueError(f"Expected 1280 disagreement questions per role and per domain: {sizes}")
+            if any(size != 1248 for by_key in sizes.values() for size in by_key.values()):
+                raise ValueError(f"Expected 1248 disagreement questions per role and per domain: {sizes}")
             # With no role, this is exactly the difference reported in the main table.
             if abs(run_delta["role"]["none"] - main_delta) > 1e-9:
                 raise ValueError(f"{path.name}: neutral-role delta disagrees with the main table")
             for group, keys in GROUPS:
                 for key in keys:
                     deltas[model][group][key].append(run_delta[group][key])
+            if model not in MODEL_LABELS:
+                continue  # the heatmaps and the evaluation-log check cover the CoT models only
             run_stats = {
                 framework: metric_by_group(gold_rows, predictions_by_id, framework)
                 for framework, _, _ in FRAMEWORKS
@@ -185,6 +188,8 @@ def main():
                 for framework, _, _ in FRAMEWORKS:
                     for key in keys:
                         pooled[group][framework][key].extend(run_stats[framework][group][key])
+        if model not in MODEL_LABELS:
+            continue
         stats[model] = {
             group: {framework: {key: summarize(values) for key, values in by_key.items()} for framework, by_key in frameworks.items()}
             for group, frameworks in pooled.items()
@@ -210,8 +215,8 @@ def main():
     )
 
     delta_note = (
-        "Each cell uses the 1,280 disagreement questions in that condition and reports the mean $\\pm$ sample standard "
-        "deviation across five sampling runs. Positive values indicate stronger WCS alignment, negative values stronger "
+        "Each cell uses the 1,248 disagreement questions in that condition. CoT entries report the mean with the sample "
+        "standard deviation across five sampling runs in parentheses; Flan-T5 entries are deterministic. Positive values indicate stronger WCS alignment, negative values stronger "
         "Classical alignment. Cells are shaded green for Classical-leaning and blue for WCS-leaning values, with the darkest "
         "shade at $\\pm$50 percentage points."
     )
@@ -219,7 +224,7 @@ def main():
     write_delta_table(
         role_delta_path, deltas, "role", ROLE_ORDER,
         r"WCS-minus-Classical match-rate difference ($\Delta$, percentage points) by role condition on the questions where "
-        "Classical Logic and WCS assign different gold labels, for the CoT models on the full all-forms dataset. "
+        "Classical Logic and WCS assign different gold labels, for all ten models on the full all-forms dataset. "
         + delta_note + " The None column equals $\\Delta$ in the main disagreement table.",
         "tab:role-disagreement-delta-final2",
     )
@@ -227,17 +232,17 @@ def main():
     write_delta_table(
         domain_delta_path, deltas, "domain", DOMAIN_ORDER,
         r"WCS-minus-Classical match-rate difference ($\Delta$, percentage points) by lexical domain on the questions where "
-        "Classical Logic and WCS assign different gold labels, for the CoT models on the full all-forms dataset, pooled "
+        "Classical Logic and WCS assign different gold labels, for all ten models on the full all-forms dataset, pooled "
         "across the four role conditions. " + delta_note,
         "tab:domain-disagreement-delta-final2",
     )
     delta_rows = [
         {
-            "model": model, "group": group, "value": key, "questions": 1280, "runs": len(deltas[model][group][key]),
+            "model": model, "group": group, "value": key, "questions": 1248, "runs": len(deltas[model][group][key]),
             "delta_pp_mean": round(statistics.fmean(deltas[model][group][key]), 4),
-            "delta_pp_sd": round(statistics.stdev(deltas[model][group][key]), 4),
+            "delta_pp_sd": round(statistics.stdev(deltas[model][group][key]), 4) if len(deltas[model][group][key]) > 1 else 0.0,
         }
-        for model in MODEL_LABELS for group, keys in GROUPS for key in keys
+        for model in DISPLAY_NAMES for group, keys in GROUPS for key in keys
     ]
     with DELTA_REPORT_PATH.open("w", newline="", encoding="utf-8") as target:
         writer = csv.DictWriter(target, fieldnames=list(delta_rows[0]))

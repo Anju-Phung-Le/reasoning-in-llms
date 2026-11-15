@@ -1,28 +1,24 @@
 {
   "AA1": [
     "Aac",
-    "Iac",
     "Ica"
   ],
   "AA2": [
     "Aca",
-    "Iac",
-    "Ica"
+    "Iac"
   ],
   "AA3": [
     "NVC"
   ],
   "AA4": [
     "Aac",
-    "Aca",
-    "Iac",
-    "Ica"
+    "Aca"
   ],
   "AE1": [
     "NVC"
   ],
   "AE2": [
-    "Oca"
+    "Eca"
   ],
   "AE3": [
     "NVC"
@@ -42,8 +38,7 @@
   ],
   "AI4": [
     "Aca",
-    "Iac",
-    "Ica"
+    "Iac"
   ],
   "AO1": [
     "NVC"
@@ -58,7 +53,7 @@
     "Oac"
   ],
   "EA1": [
-    "Oac"
+    "Eac"
   ],
   "EA2": [
     "NVC"
@@ -82,7 +77,7 @@
     "NVC"
   ],
   "EI1": [
-    "Oac"
+    "Eac"
   ],
   "EI2": [
     "NVC"
@@ -117,14 +112,13 @@
   ],
   "IA4": [
     "Aac",
-    "Iac",
     "Ica"
   ],
   "IE1": [
     "NVC"
   ],
   "IE2": [
-    "Oca"
+    "Eca"
   ],
   "IE3": [
     "NVC"

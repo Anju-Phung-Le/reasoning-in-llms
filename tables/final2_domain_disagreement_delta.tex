@@ -2,19 +2,22 @@
 % Requires \usepackage[table]{xcolor} and \usepackage{booktabs}
 \begin{table}[H]
 \centering
-\caption{WCS-minus-Classical match-rate difference ($\Delta$, percentage points) by lexical domain on the questions where Classical Logic and WCS assign different gold labels, for the CoT models on the full all-forms dataset, pooled across the four role conditions. Each cell uses the 1,280 disagreement questions in that condition and reports the mean $\pm$ sample standard deviation across five sampling runs. Positive values indicate stronger WCS alignment, negative values stronger Classical alignment. Cells are shaded green for Classical-leaning and blue for WCS-leaning values, with the darkest shade at $\pm$50 percentage points.}
+\caption{WCS-minus-Classical match-rate difference ($\Delta$, percentage points) by lexical domain on the questions where Classical Logic and WCS assign different gold labels, for all ten models on the full all-forms dataset, pooled across the four role conditions. Each cell uses the 1,248 disagreement questions in that condition. CoT entries report the mean with the sample standard deviation across five sampling runs in parentheses; Flan-T5 entries are deterministic. Positive values indicate stronger WCS alignment, negative values stronger Classical alignment. Cells are shaded green for Classical-leaning and blue for WCS-leaning values, with the darkest shade at $\pm$50 percentage points.}
 \label{tab:domain-disagreement-delta-final2}
 \begin{tabular}{lrrrr}
 \toprule
 Model & Animals $(\Delta)$ & Nature $(\Delta)$ & Objects $(\Delta)$ & People $(\Delta)$ \\
 \midrule
-Mistral-7B & \cellcolor[HTML]{E5E6E7}+5.06 $\pm$ 1.88 & \cellcolor[HTML]{EBEBEA}+2.62 $\pm$ 1.30 & \cellcolor[HTML]{E7E8E8}+4.28 $\pm$ 1.48 & \cellcolor[HTML]{ECECEA}+2.52 $\pm$ 1.81 \\
-Llama-8B & \cellcolor[HTML]{EFEEEB}+1.33 $\pm$ 1.80 & \cellcolor[HTML]{F1F0EC}-0.45 $\pm$ 1.63 & \cellcolor[HTML]{E8E8E8}+4.11 $\pm$ 1.69 & \cellcolor[HTML]{DEE0E3}+7.84 $\pm$ 1.49 \\
-OLMo-13B & \cellcolor[HTML]{E1E3E5}+6.53 $\pm$ 2.40 & \cellcolor[HTML]{D8DCE1}+10.02 $\pm$ 0.68 & \cellcolor[HTML]{DEE0E4}+7.78 $\pm$ 0.70 & \cellcolor[HTML]{E1E3E5}+6.72 $\pm$ 1.47 \\
-DeepSeek-Llama-8B & \cellcolor[HTML]{DBE2D8}-9.06 $\pm$ 1.50 & \cellcolor[HTML]{C5D3C5}-17.58 $\pm$ 1.80 & \cellcolor[HTML]{DFE5DD}-7.27 $\pm$ 1.89 & \cellcolor[HTML]{CCD7CB}-15.08 $\pm$ 1.86 \\
-DeepSeek-Qwen-14B & \cellcolor[HTML]{B6C9B8}-23.48 $\pm$ 1.16 & \cellcolor[HTML]{9CB8A0}-33.86 $\pm$ 1.56 & \cellcolor[HTML]{97B49C}-35.83 $\pm$ 1.05 & \cellcolor[HTML]{91B097}-38.12 $\pm$ 1.06 \\
-Mistral-24B & \cellcolor[HTML]{CCD8CC}-14.77 $\pm$ 0.97 & \cellcolor[HTML]{C8D5C8}-16.34 $\pm$ 1.05 & \cellcolor[HTML]{CED9CD}-14.23 $\pm$ 0.85 & \cellcolor[HTML]{C2D1C3}-18.70 $\pm$ 1.16 \\
-DeepSeek-Qwen-32B & \cellcolor[HTML]{9DB8A1}-33.45 $\pm$ 1.27 & \cellcolor[HTML]{92B197}-37.72 $\pm$ 1.11 & \cellcolor[HTML]{8CAD92}-40.00 $\pm$ 0.88 & \cellcolor[HTML]{79A182}-47.34 $\pm$ 2.20 \\
+Flan-T5 Small & \cellcolor[HTML]{DEE1E4}+7.69 & \cellcolor[HTML]{DEE1E4}+7.69 & \cellcolor[HTML]{DEE1E4}+7.69 & \cellcolor[HTML]{DEE1E4}+7.69 \\
+Flan-T5 Base & \cellcolor[HTML]{E0E2E4}+7.13 & \cellcolor[HTML]{E8E8E8}+4.09 & \cellcolor[HTML]{EBEBEA}+2.80 & \cellcolor[HTML]{F0F0EB}-0.72 \\
+Flan-T5 Large & \cellcolor[HTML]{F2F1ED}+0.16 & \cellcolor[HTML]{ECEDE7}-2.48 & \cellcolor[HTML]{F1F0ED}+0.40 & \cellcolor[HTML]{E8E8E8}+4.09 \\
+Mistral-7B & \cellcolor[HTML]{E9EBE5}-3.53 (1.62) & \cellcolor[HTML]{E7EAE3}-4.29 (1.07) & \cellcolor[HTML]{E8EAE4}-4.07 (1.37) & \cellcolor[HTML]{E5E8E1}-5.11 (1.51) \\
+Llama-8B & \cellcolor[HTML]{DFE4DC}-7.61 (2.09) & \cellcolor[HTML]{D9E1D7}-9.63 (1.64) & \cellcolor[HTML]{E2E6DE}-6.47 (2.15) & \cellcolor[HTML]{ECEDE7}-2.53 (1.72) \\
+OLMo-13B & \cellcolor[HTML]{ECEDE7}-2.47 (2.03) & \cellcolor[HTML]{EDEDEB}+1.92 (0.62) & \cellcolor[HTML]{F1F0EC}-0.48 (1.05) & \cellcolor[HTML]{EDEEE9}-1.97 (1.66) \\
+DeepSeek-Llama-8B & \cellcolor[HTML]{C8D5C7}-16.63 (2.23) & \cellcolor[HTML]{AEC4B1}-26.52 (1.59) & \cellcolor[HTML]{C9D6C9}-15.95 (1.82) & \cellcolor[HTML]{B3C7B5}-24.81 (1.53) \\
+DeepSeek-Qwen-14B & \cellcolor[HTML]{A1BBA5}-31.73 (1.10) & \cellcolor[HTML]{85A98C}-42.64 (1.50) & \cellcolor[HTML]{83A78A}-43.64 (0.95) & \cellcolor[HTML]{7BA283}-46.89 (1.34) \\
+Mistral-24B & \cellcolor[HTML]{B8CBBA}-22.68 (1.15) & \cellcolor[HTML]{B4C8B6}-24.46 (1.46) & \cellcolor[HTML]{BACCBB}-22.12 (1.22) & \cellcolor[HTML]{ACC2AF}-27.45 (1.54) \\
+DeepSeek-Qwen-32B & \cellcolor[HTML]{88AA8F}-41.63 (1.33) & \cellcolor[HTML]{7CA284}-46.47 (1.04) & \cellcolor[HTML]{769E7E}-48.85 (0.60) & \cellcolor[HTML]{739C7C}-56.59 (2.04) \\
 \bottomrule
 \end{tabular}
 \end{table}
